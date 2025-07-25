@@ -8,7 +8,7 @@ import onlyWarn from "eslint-plugin-only-warn";
 export const config = [
   eslint.configs.recommended,
   eslintConfigPrettier,
-  ...tseslint.configs.recommendedTypeChecked,
+  ...tseslint.configs.recommended,
   {
     plugins: {
       turbo: turboPlugin,
