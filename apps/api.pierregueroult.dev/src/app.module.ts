@@ -5,6 +5,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Token } from '@repo/db/entities/token';
 
 import { validateEnvironment } from './env.validation';
+import { ChatModule } from './chat/chat.module';
+import { PlatformModule } from './platform/platform.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { validateEnvironment } from './env.validation';
         synchronize: configService.getOrThrow<string>('NODE_ENV') !== 'production',
       }),
     }),
+    ChatModule,
+    PlatformModule,
   ],
   controllers: [],
   providers: [],
