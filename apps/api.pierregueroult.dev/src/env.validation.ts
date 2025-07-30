@@ -15,12 +15,10 @@ class EnvironmentVariables {
   @Max(65535)
   NEST_PORT: number;
 
-  @IsUrl()
   @Matches(/https?:\/\//)
   NEST_CORS_ORIGIN: string;
 
-  @IsUrl()
-  @Matches(/mongodb+src:\/\//)
+  @Matches(/mongodb\+srv:\/\//)
   NEST_DATABASE_URL: string;
 
   @IsString()
@@ -40,6 +38,7 @@ class EnvironmentVariables {
 }
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {
+
   const validateConfig = plainToInstance(EnvironmentVariables, config, {
     enableImplicitConversion: true,
   });

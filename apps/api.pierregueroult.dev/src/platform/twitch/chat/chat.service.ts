@@ -26,7 +26,14 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
   private async connect() {
     if (this.isConnected) return;
 
-    const accessToken = await this.twitchAuthService.getAccessToken();
+    let accessToken: string;
+    try {
+      accessToken = await this.twitchAuthService.getAccessToken();
+    } catch {
+      this.logger.error('Could not connect to Twitch chat: Access token not available');
+      return;
+    }
+
     const channel = this.configService.get<string>('NEST_TWITCH_CHANNEL');
     const username = this.configService.get<string>('NEST_TWITCH_USERNAME');
 
