@@ -1,9 +1,9 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn,  UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, Entity, ObjectIdColumn, UpdateDateColumn } from "typeorm";
 
 @Entity()
 export class Token {
-  @PrimaryGeneratedColumn("uuid")
-  id: string;
+  @ObjectIdColumn()
+  _id: string;
 
   @Column({ unique: true })
   name: string;
