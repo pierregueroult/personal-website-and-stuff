@@ -1,4 +1,4 @@
-import { config as baseConfig } from "./base.js";
+import { config as reactConfig } from "./react.js";
 
 /** @type {import('prettier').Options} */
-export const config = { ...baseConfig };
+export const config = { ...reactConfig };

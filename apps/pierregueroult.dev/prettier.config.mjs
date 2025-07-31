@@ -1,3 +1,3 @@
-import { config as nextConfig } from '@repo/prettier-config/nest-js';
+import { config as nextConfig } from '@repo/prettier-config/next-js';
 
-export default nextConfig;
+export default { ...nextConfig, tailwindStylesheet: '@repo/ui/styles/globals.css' };
