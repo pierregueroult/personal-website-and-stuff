@@ -5,17 +5,18 @@
   "private": true,
   "scripts": {
     "dev": "next dev --turbopack --port 3000",
-    "build": "next build",
+    "build": "next build --turbopack",
     "start": "next start",
     "lint": "next lint --max-warnings 0",
     "check-types": "tsc --noEmit",
     "format": "prettier --write ."
   },
   "dependencies": {
-    "@repo/ui": "workspace:*",
     "@repo/db": "workspace:*",
+    "@repo/ui": "workspace:*",
     "@t3-oss/env-nextjs": "^0.13.8",
-    "next": "^15.4.2",
+    "babel-plugin-react-compiler": "19.1.0-rc.2",
+    "next": "^15.4.5",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "zod": "^3.25.76"
