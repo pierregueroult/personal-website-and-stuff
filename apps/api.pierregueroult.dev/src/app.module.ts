@@ -9,6 +9,7 @@ import { AuthModule } from './auth/auth.module';
 import { ChatModule } from './chat/chat.module';
 import { validateEnvironment } from './env.validation';
 import { PlatformModule } from './platform/platform.module';
+import { AnalyticsModule } from './analytics/analytics.module';
 
 @Module({
   imports: [
@@ -18,16 +19,27 @@ import { PlatformModule } from './platform/platform.module';
       inject: [ConfigService],
       useFactory: async (configService: ConfigService) => ({
         type: 'mongodb',
-        url: configService.getOrThrow<string>('NEST_DATABASE_URL'),
+        url: configService.get<string>('NEST_DATABASE_URL'),
         entities: [Token, User],
         logging: true,
         autoLoadEntities: true,
-        synchronize: configService.getOrThrow<string>('NODE_ENV') !== 'production',
+        synchronize: configService.get<string>('NODE_ENV') !== 'production',
+      }),
+    }),
+    AnalyticsModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        apiKey: configService.get<string>('NEST_POSTHOG_API_KEY'),
+        options: {
+          host: configService.get<string>('NEST_POSTHOG_HOST'),
+        },
       }),
     }),
     ChatModule,
     PlatformModule,
     AuthModule,
+    AnalyticsModule,
   ],
   controllers: [],
   providers: [],

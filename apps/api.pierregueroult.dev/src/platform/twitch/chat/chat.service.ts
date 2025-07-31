@@ -21,7 +21,7 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleDestroy() {
-    this.logger.log('Module destroyed');
+    this.disconnect();
   }
 
   private async connect() {
