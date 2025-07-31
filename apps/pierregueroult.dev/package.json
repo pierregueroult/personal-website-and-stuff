@@ -13,9 +13,12 @@
   },
   "dependencies": {
     "@repo/ui": "workspace:*",
+    "@repo/db": "workspace:*",
+    "@t3-oss/env-nextjs": "^0.13.8",
     "next": "^15.4.2",
     "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "react-dom": "^19.1.0",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",
