@@ -1,13 +1,14 @@
-import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { ConfigService } from '@nestjs/config';
 import { HttpService } from '@nestjs/axios';
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { InjectRepository } from '@nestjs/typeorm';
 
+import { AxiosResponse } from 'axios';
 import { Repository } from 'typeorm';
 
 import { Token } from '@repo/db/entities/token';
+
 import { TwitchTokenResponse } from './auth.interface';
-import { AxiosResponse } from 'axios';
 
 @Injectable()
 export class TwitchAuthService {

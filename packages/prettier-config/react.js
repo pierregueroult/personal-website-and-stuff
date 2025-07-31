@@ -4,5 +4,7 @@ import { config as baseConfig } from "./base.js";
 export const config = {
   ...baseConfig,
   plugins: [...(baseConfig.plugins || []), "prettier-plugin-tailwindcss"],
-  tailwindFunctions: ["cva", "cn"]
+  tailwindFunctions: ["cva", "cn"],
+  importOrderParserPlugins: ["typescript", "jsx", "classProperties"],
+  importOrder: ["^[a-zA-Z]", "^@/", "^[./]"],
 };

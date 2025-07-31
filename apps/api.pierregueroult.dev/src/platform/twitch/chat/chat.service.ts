@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
-import { TwitchAuthService } from '../auth/auth.service';
 import { ConfigService } from '@nestjs/config';
+
+import { TwitchAuthService } from '../auth/auth.service';
 
 @Injectable()
 export class TwitchChatService implements OnModuleInit, OnModuleDestroy {

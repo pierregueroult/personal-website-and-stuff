@@ -5,10 +5,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Token } from '@repo/db/entities/token';
 import { User } from '@repo/db/entities/user';
 
-import { validateEnvironment } from './env.validation';
-import { ChatModule } from './chat/chat.module';
-import { PlatformModule } from './platform/platform.module';
 import { AuthModule } from './auth/auth.module';
+import { ChatModule } from './chat/chat.module';
+import { validateEnvironment } from './env.validation';
+import { PlatformModule } from './platform/platform.module';
 
 @Module({
   imports: [

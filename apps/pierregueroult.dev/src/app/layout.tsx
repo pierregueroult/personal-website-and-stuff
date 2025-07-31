@@ -1,6 +1,7 @@
-import type { ReactNode } from 'react';
-import { JetBrains_Mono } from 'next/font/google';
 import '@repo/ui/styles/globals.css';
+
+import { JetBrains_Mono } from 'next/font/google';
+import type { ReactNode } from 'react';
 
 type RootLayoutProps = Readonly<{ children: ReactNode }>;
 

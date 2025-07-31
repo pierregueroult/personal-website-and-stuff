@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
-import { UserService } from './user.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { User } from '@repo/db/entities/user';
 import { AuthorizedEmail } from '@repo/db/entities/authorized-email';
+import { User } from '@repo/db/entities/user';
+
+import { UserService } from './user.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([User, AuthorizedEmail])],

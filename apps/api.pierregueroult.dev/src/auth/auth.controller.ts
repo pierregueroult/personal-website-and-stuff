@@ -1,10 +1,13 @@
 import { Controller, Get, HttpCode, HttpStatus, Req, Res, UseGuards } from '@nestjs/common';
-import { GithubGuard } from './guards/github.guard';
-import { Public } from './decorators/public.decorator';
-import { Request, Response } from 'express';
-import { User } from '@repo/db/entities/user';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtService } from '@nestjs/jwt';
+
+import { Request, Response } from 'express';
+
+import { User } from '@repo/db/entities/user';
+
+import { Public } from './decorators/public.decorator';
+import { GithubGuard } from './guards/github.guard';
 
 @Controller('auth')
 export class AuthController {

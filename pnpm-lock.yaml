@@ -8,9 +8,12 @@ importers:
 
   .:
     devDependencies:
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^5.2.2
+        version: 5.2.2(prettier@3.6.2)
       prettier-plugin-tailwindcss:
         specifier: ^0.6.14
-        version: 0.6.14(prettier@3.6.2)
+        version: 0.6.14(@trivago/prettier-plugin-sort-imports@5.2.2(prettier@3.6.2))(prettier@3.6.2)
       turbo:
         specifier: ^2.5.5
         version: 2.5.5
@@ -254,12 +257,15 @@ importers:
 
   packages/prettier-config:
     devDependencies:
+      '@trivago/prettier-plugin-sort-imports':
+        specifier: ^5.2.2
+        version: 5.2.2(prettier@3.6.2)
       prettier:
         specifier: ^3.6.2
         version: 3.6.2
       prettier-plugin-tailwindcss:
         specifier: ^0.6.14
-        version: 0.6.14(prettier@3.6.2)
+        version: 0.6.14(@trivago/prettier-plugin-sort-imports@5.2.2(prettier@3.6.2))(prettier@3.6.2)
 
   packages/typescript-config: {}
 
@@ -375,12 +381,41 @@ packages:
     resolution: {integrity: sha512-cjQ7ZlQ0Mv3b47hABuTevyTuYN4i+loJKGeV9flcCgIK37cCXRh+L1bd3iBHlynerhQ7BhCkn2BPbQUL+rGqFg==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/generator@7.28.0':
+    resolution: {integrity: sha512-lJjzvrbEeWrhB4P3QBsH7tey117PjLZnDbLiQEKjQ/fNJTjuq4HSqgFA+UNSwZT8D7dxxbnuSBMsa1lrWzKlQg==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-globals@7.28.0':
+    resolution: {integrity: sha512-+W6cISkXFa1jXsDEdYA8HeevQT/FULhxzR99pxphltZcVaugps53THCeiWA8SguxxpSp3gKPiuYfSWopkLQ4hw==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/helper-string-parser@7.27.1':
+    resolution: {integrity: sha512-qMlSxKbpRlAridDExk92nSobyDdpPijUq2DW6oDnUqd0iOGxmQjyqhMIihI9+zv4LPyZdRje2cavWPbCbWm3eA==}
+    engines: {node: '>=6.9.0'}
+
   '@babel/helper-validator-identifier@7.27.1':
     resolution: {integrity: sha512-D2hP9eA+Sqx1kBZgzxZh0y1trbuU+JoDkiEwqhQ36nodYqJwyEIhPSdMNd7lOm/4io72luTPWH20Yda0xOuUow==}
     engines: {node: '>=6.9.0'}
 
+  '@babel/parser@7.28.0':
+    resolution: {integrity: sha512-jVZGvOxOuNSsuQuLRTh13nU0AogFlw32w/MT+LV6D3sP5WdbW61E77RnkbaO2dUvmPAYrBDJXGn5gGS6tH4j8g==}
+    engines: {node: '>=6.0.0'}
+    hasBin: true
+
   '@babel/runtime-corejs3@7.28.0':
     resolution: {integrity: sha512-nlIXnSqLcBij8K8TtkxbBJgfzfvi75V1pAKSM7dUXejGw12vJAqez74jZrHTsJ3Z+Aczc5Q/6JgNjKRMsVU44g==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/template@7.27.2':
+    resolution: {integrity: sha512-LPDZ85aEJyYSd18/DkjNh4/y1ntkE5KwUHWTiqgRxruuZL2F1yuHligVHLvcHY2vMHXttKFpJn6LwfI7cw7ODw==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/traverse@7.28.0':
+    resolution: {integrity: sha512-mGe7UK5wWyh0bKRfupsUchrQGqvDbZDbKJw+kcRGSmdHVYrv+ltd0pnpDTVpiTqnaBru9iEvA8pz8W46v0Amwg==}
+    engines: {node: '>=6.9.0'}
+
+  '@babel/types@7.28.2':
+    resolution: {integrity: sha512-ruv7Ae4J5dUYULmeXw1gmb7rYRz57OWCPM57pHojnLq/3Z1CK2lNSLTCVjxVk1F/TZHwOZZrOWi0ur95BbLxNQ==}
     engines: {node: '>=6.9.0'}
 
   '@colors/colors@1.5.0':
@@ -1224,6 +1259,22 @@ packages:
 
   '@tootallnate/quickjs-emscripten@0.23.0':
     resolution: {integrity: sha512-C5Mc6rdnsaJDjO3UpGW/CQTHtCKaYlScZTly4JIu97Jxo/odCiH0ITnDXSJPTOrEKk/ycSZ0AOgTmkDtkOsvIA==}
+
+  '@trivago/prettier-plugin-sort-imports@5.2.2':
+    resolution: {integrity: sha512-fYDQA9e6yTNmA13TLVSA+WMQRc5Bn/c0EUBditUHNfMMxN7M82c38b1kEggVE3pLpZ0FwkwJkUEKMiOi52JXFA==}
+    engines: {node: '>18.12'}
+    peerDependencies:
+      '@vue/compiler-sfc': 3.x
+      prettier: 2.x - 3.x
+      prettier-plugin-svelte: 3.x
+      svelte: 4.x || 5.x
+    peerDependenciesMeta:
+      '@vue/compiler-sfc':
+        optional: true
+      prettier-plugin-svelte:
+        optional: true
+      svelte:
+        optional: true
 
   '@tsconfig/node10@1.0.11':
     resolution: {integrity: sha512-DcRjDCujK/kCk/cUe8Xz8ZSpm8mS3mNNpta+jGCA6USEDfktlNvm1+IuZ9eTcDbNk41BHwpHHeW+N1lKCz4zOw==}
@@ -2808,6 +2859,9 @@ packages:
     resolution: {integrity: sha512-zptv57P3GpL+O0I7VdMJNBZCu+BPHVQUk55Ft8/QCJjTVxrnJHuVuX/0Bl2A6/+2oyR/ZMEuFKwmzqqZ/U5nPQ==}
     engines: {node: 20 || >=22}
 
+  javascript-natural-sort@0.7.1:
+    resolution: {integrity: sha512-nO6jcEfZWQXDhOiBtG2KvKyEptz7RVbpGP4vTD2hLBdmNQSsCiicO2Ioinv6UI4y9ukqnBpy+XZ9H6uLNgJTlw==}
+
   jest-worker@27.5.1:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
@@ -2825,6 +2879,11 @@ packages:
 
   jsbn@1.1.0:
     resolution: {integrity: sha512-4bYVV3aAMtDTTu4+xsDYa6sy9GyJ69/amsu9sYF2zqjiEoZA5xJi3BrfX3uY+/IekIu7MwdObdbDWpoZdBv3/A==}
+
+  jsesc@3.1.0:
+    resolution: {integrity: sha512-/sM3dO2FOzXjKQhJuo0Q173wf2KOo8t4I8vHy6lF9poUp7bKT0/NHE8fPX23PwfhnykfqnC2xRxOnVw5XuGIaA==}
+    engines: {node: '>=6'}
+    hasBin: true
 
   json-buffer@3.0.1:
     resolution: {integrity: sha512-4bV5BfR2mqfQTJm+V5tPPdf+ZpuhiIvTuAB5g8kcrXOZpTT/QwwVRWBywX1ozr6lEuPdbHxwaJlm9G6mI2sfSQ==}
@@ -4492,11 +4551,50 @@ snapshots:
       js-tokens: 4.0.0
       picocolors: 1.1.1
 
+  '@babel/generator@7.28.0':
+    dependencies:
+      '@babel/parser': 7.28.0
+      '@babel/types': 7.28.2
+      '@jridgewell/gen-mapping': 0.3.12
+      '@jridgewell/trace-mapping': 0.3.29
+      jsesc: 3.1.0
+
+  '@babel/helper-globals@7.28.0': {}
+
+  '@babel/helper-string-parser@7.27.1': {}
+
   '@babel/helper-validator-identifier@7.27.1': {}
+
+  '@babel/parser@7.28.0':
+    dependencies:
+      '@babel/types': 7.28.2
 
   '@babel/runtime-corejs3@7.28.0':
     dependencies:
       core-js-pure: 3.44.0
+
+  '@babel/template@7.27.2':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/parser': 7.28.0
+      '@babel/types': 7.28.2
+
+  '@babel/traverse@7.28.0':
+    dependencies:
+      '@babel/code-frame': 7.27.1
+      '@babel/generator': 7.28.0
+      '@babel/helper-globals': 7.28.0
+      '@babel/parser': 7.28.0
+      '@babel/template': 7.27.2
+      '@babel/types': 7.28.2
+      debug: 4.4.1
+    transitivePeerDependencies:
+      - supports-color
+
+  '@babel/types@7.28.2':
+    dependencies:
+      '@babel/helper-string-parser': 7.27.1
+      '@babel/helper-validator-identifier': 7.27.1
 
   '@colors/colors@1.5.0':
     optional: true
@@ -5242,6 +5340,18 @@ snapshots:
   '@tokenizer/token@0.3.0': {}
 
   '@tootallnate/quickjs-emscripten@0.23.0': {}
+
+  '@trivago/prettier-plugin-sort-imports@5.2.2(prettier@3.6.2)':
+    dependencies:
+      '@babel/generator': 7.28.0
+      '@babel/parser': 7.28.0
+      '@babel/traverse': 7.28.0
+      '@babel/types': 7.28.2
+      javascript-natural-sort: 0.7.1
+      lodash: 4.17.21
+      prettier: 3.6.2
+    transitivePeerDependencies:
+      - supports-color
 
   '@tsconfig/node10@1.0.11': {}
 
@@ -7208,6 +7318,8 @@ snapshots:
     dependencies:
       '@isaacs/cliui': 8.0.2
 
+  javascript-natural-sort@0.7.1: {}
+
   jest-worker@27.5.1:
     dependencies:
       '@types/node': 22.15.3
@@ -7223,6 +7335,8 @@ snapshots:
       argparse: 2.0.1
 
   jsbn@1.1.0: {}
+
+  jsesc@3.1.0: {}
 
   json-buffer@3.0.1: {}
 
@@ -7801,9 +7915,11 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-tailwindcss@0.6.14(prettier@3.6.2):
+  prettier-plugin-tailwindcss@0.6.14(@trivago/prettier-plugin-sort-imports@5.2.2(prettier@3.6.2))(prettier@3.6.2):
     dependencies:
       prettier: 3.6.2
+    optionalDependencies:
+      '@trivago/prettier-plugin-sort-imports': 5.2.2(prettier@3.6.2)
 
   prettier@3.6.2: {}
 
