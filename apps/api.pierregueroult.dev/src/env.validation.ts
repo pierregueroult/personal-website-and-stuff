@@ -61,6 +61,12 @@ class EnvironmentVariables {
 
   @IsString()
   NEST_GITHUB_CLIENT_SECRET: string;
+
+  @IsString()
+  NEST_POSTHOG_API_KEY: string;
+
+  @IsUrl()
+  NEST_POSTHOG_HOST: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {
