@@ -10,6 +10,7 @@ import { ChatModule } from './chat/chat.module';
 import { validateEnvironment } from './env.validation';
 import { PlatformModule } from './platform/platform.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { MailerModule } from './mailer/mailer.module';
 
 @Module({
   imports: [
@@ -40,6 +41,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
     PlatformModule,
     AuthModule,
     AnalyticsModule,
+    MailerModule,
   ],
   controllers: [],
   providers: [],
