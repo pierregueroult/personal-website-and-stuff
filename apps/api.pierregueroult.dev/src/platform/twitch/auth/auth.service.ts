@@ -16,7 +16,7 @@ export class TwitchAuthService {
     private readonly tokenRepository: Repository<Token>,
     private readonly configService: ConfigService,
     private readonly httpService: HttpService,
-  ) { }
+  ) {}
 
   private readonly REFRESH_MARGIN = 5 * 60 * 1000;
 

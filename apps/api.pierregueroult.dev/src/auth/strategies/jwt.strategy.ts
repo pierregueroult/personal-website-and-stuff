@@ -9,8 +9,7 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
   constructor(configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: Request) =>
-          request.cookies['auth-token'] as string | undefined,
+        (request: Request) => request.cookies['auth-token'] as string | undefined,
       ]),
       secretOrKey: configService.get<string>('NEST_JWT_SECRET'),
     });

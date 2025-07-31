@@ -31,9 +31,7 @@ export class AuthController {
         `${this.configService.get<string>('NEST_CORS_ORIGIN')}/auth/github/callback?token=${token}`,
       );
     } else {
-      return res.redirect(
-        `${this.configService.get<string>('NEST_CORS_ORIGIN')}/auth/sigin-in`,
-      );
+      return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/auth/sigin-in`);
     }
   }
 }

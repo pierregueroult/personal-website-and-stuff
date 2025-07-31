@@ -30,7 +30,7 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     const user = await this.userService.findGithubUser(primaryEmail, profile.id);
 
     if (user) return user;
-    
+
     return this.userService.createGithubUser(
       primaryEmail,
       profile.displayName,

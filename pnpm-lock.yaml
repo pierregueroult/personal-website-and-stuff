@@ -206,6 +206,9 @@ importers:
       '@types/node':
         specifier: ^24.0.12
         version: 24.1.0
+      prettier:
+        specifier: ^3.6.2
+        version: 3.6.2
       typescript:
         specifier: ^5.8.3
         version: 5.8.3
