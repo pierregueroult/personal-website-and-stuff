@@ -2,8 +2,8 @@ import type { EventMessage, GroupIdentifyMessage, IdentifyMessage, PostHogOption
 
 export interface PosthogModuleOptions {
   apiKey: string;
+  mock?: boolean;
   options?: PostHogOptions;
-  enabled?: boolean;
 }
 
 export interface PosthogModuleAsyncOptions {
@@ -12,11 +12,11 @@ export interface PosthogModuleAsyncOptions {
   imports?: any[];
 }
 
-export interface PosthogCaptureProps extends EventMessage {}
+export type PosthogCaptureProps = EventMessage
 
-export interface PosthogIdentifyProps extends IdentifyMessage {}
+export type PosthogIdentifyProps = IdentifyMessage
 
-export interface PosthogGroupIdentifyProps extends GroupIdentifyMessage {}
+export type PosthogGroupIdentifyProps = GroupIdentifyMessage
 
 export interface PosthogAliasProps {
   distinctId: string;

@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, LoggerService } from '@nestjs/common';
 import { PostHog } from 'posthog-node';
 import { POSTHOG_OPTIONS } from './analytics.constants';
 import type {
@@ -11,39 +11,38 @@ import type {
 
 @Injectable()
 export class AnalyticsService {
-  private readonly client: PostHog | null;
+  private readonly client: PostHog;
+  private readonly mock: boolean;
 
-  constructor(@Inject(POSTHOG_OPTIONS) private readonly options: PosthogModuleOptions) {
-    if (!options.enabled) this.client = null;
-    else this.client = new PostHog(options.apiKey, options.options);
+  constructor(
+    @Inject(POSTHOG_OPTIONS) private readonly options: PosthogModuleOptions,
+    private readonly loggerService: LoggerService,
+  ) {
+    this.client = new PostHog(options.apiKey, options.options);
+    this.mock = options.mock ?? false;
   }
 
   capture(props: PosthogCaptureProps): void {
-    if (!this.client) return;
-    this.client.capture(props);
+    if (!this.mock) this.client.capture(props);
+    else this.loggerService.log(`Mock capture: ${JSON.stringify(props)}`);
   }
 
   identify(props: PosthogIdentifyProps): void {
-    if (!this.client) return;
-    this.client.identify(props);
+    if (!this.mock) this.client.identify(props);
+    else this.loggerService.log(`Mock identify: ${JSON.stringify(props)}`);
   }
 
   groupIdentify(props: PosthogGroupIdentifyProps): void {
-    if (!this.client) return;
-    this.client.groupIdentify(props);
+    if (!this.mock) this.client.groupIdentify(props);
+    else this.loggerService.log(`Mock groupIdentify: ${JSON.stringify(props)}`);
   }
 
   alias(props: PosthogAliasProps): void {
-    if (!this.client) return;
-    this.client.alias(props);
+    if (!this.mock) this.client.alias(props);
+    else this.loggerService.log(`Mock alias: ${JSON.stringify(props)}`);
   }
 
   shutdown() {
-    if (!this.client) return;
     void this.client.shutdown();
-  }
-
-  isEnabled(): boolean {
-    return !!this.client;
   }
 }
