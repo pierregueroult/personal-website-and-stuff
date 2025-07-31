@@ -37,4 +37,10 @@ export class AuthController {
       return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/auth/sigin-in`);
     }
   }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('me')
+  async me(@Req() req: Request) {
+    return req.user;
+  }
 }
