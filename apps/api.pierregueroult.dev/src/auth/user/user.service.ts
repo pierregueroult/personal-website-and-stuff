@@ -4,6 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
 import { AuthorizedEmail } from '@repo/db/entities/authorized-email';
+import { Token } from '@repo/db/entities/token';
 import { User } from '@repo/db/entities/user';
 
 @Injectable()

@@ -1,4 +1,5 @@
-import { Controller, Get, HttpCode, HttpStatus, Req, Res, UseGuards } from '@nestjs/common';
+import { HttpService } from '@nestjs/axios';
+import { Controller, Get, HttpCode, HttpStatus, Param, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -6,6 +7,7 @@ import { Request, Response } from 'express';
 
 import { User } from '@repo/db/entities/user';
 
+import { TwitchAuthService } from '../platform/twitch/auth/auth.service';
 import { Public } from './decorators/public.decorator';
 import { GithubGuard } from './guards/github.guard';
 
@@ -14,6 +16,8 @@ export class AuthController {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly httpService: HttpService,
+    private readonly twitchAuthService: TwitchAuthService,
   ) {}
 
   @HttpCode(HttpStatus.OK)
@@ -42,5 +46,31 @@ export class AuthController {
   @Get('me')
   async me(@Req() req: Request) {
     return req.user;
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('twitch/callback')
+  async twitch(@Param('code') code: string, @Res() res: Response) {
+    try {
+      await this.twitchAuthService.setAccessToken(code);
+      return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/?twitch=success`);
+    } catch {
+      return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/?twitch=error`);
+    }
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Get('twitch')
+  async twitchAuth(@Res() res: Response) {
+    const searchParams = new URLSearchParams({
+      client_id: this.configService.get<string>('NEST_TWITCH_CLIENT_ID'),
+      redirect_uri: this.configService.get<string>('NEST_TWITCH_REDIRECT_URI'),
+      response_type: 'code',
+      scope: 'user:read:email chat:read chat:edit',
+    });
+
+    const url = `https://id.twitch.tv/oauth2/authorize?${searchParams.toString()}`;
+
+    return res.redirect(url);
   }
 }

@@ -8,11 +8,14 @@ import { AuthService } from './auth.service';
 import { GithubStrategy } from './strategies/github.stategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from './user/user.module';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   imports: [
     PassportModule,
     ConfigModule,
+    HttpModule,
+    UserModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -23,7 +26,6 @@ import { UserModule } from './user/user.module';
         },
       }),
     }),
-    UserModule,
   ],
   providers: [AuthService, JwtStrategy, GithubStrategy],
   controllers: [AuthController],

@@ -47,7 +47,9 @@ export class TwitchAuthService {
       const response: AxiosResponse<TwitchTokenResponse> = await this.httpService.axiosRef.post(
         'https://id.twitch.tv/oauth2/token',
         params,
-        { headers: { 'Content-Type': 'application/x-www-form-urlencoded' } },
+        {
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        },
       );
 
       const { access_token, refresh_token, expires_in } = response.data;
@@ -65,6 +67,49 @@ export class TwitchAuthService {
       } else {
         throw new Error('Failed to refresh Twitch access token due to an unknown error');
       }
+    }
+  }
+
+  async setAccessToken(code: string) {
+    const formParams = new URLSearchParams({
+      client_id: this.configService.get<string>('NEST_TWITCH_CLIENT_ID'),
+      client_secret: this.configService.get<string>('NEST_TWITCH_CLIENT_SECRET'),
+      code,
+      grant_type: 'authorization_code',
+      redirect_uri: this.configService.get<string>('NEST_TWITCH_REDIRECT_URI'),
+    });
+
+    const response: AxiosResponse<TwitchTokenResponse> = await this.httpService.axiosRef.post(
+      'https://id.twitch.tv/oauth2/token',
+      formParams,
+      {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    );
+
+    if (response.status !== 200) {
+      throw new Error(`Failed to set Twitch access token: ${response.statusText}`);
+    }
+
+    const { access_token, refresh_token, expires_in } = response.data;
+
+    const token = await this.tokenRepository.findOne({ where: { name: 'twitch' } });
+
+    if (!token) {
+      const newToken = this.tokenRepository.create({
+        name: 'twitch',
+        accessToken: access_token,
+        refreshToken: refresh_token,
+        expiresAt: new Date(Date.now() + expires_in * 1000),
+      });
+      await this.tokenRepository.save(newToken);
+    } else {
+      token.accessToken = access_token;
+      token.refreshToken = refresh_token;
+      token.expiresAt = new Date(Date.now() + expires_in * 1000);
+      await this.tokenRepository.save(token);
     }
   }
 }
