@@ -3,7 +3,6 @@ const nextConfig = {
   transpilePackages: ['@repo/ui'],
   experimental: {
     reactCompiler: true,
-    typedRoutes: true,
   },
   poweredByHeader: false,
   async rewrites() {

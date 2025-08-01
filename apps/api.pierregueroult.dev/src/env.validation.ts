@@ -53,7 +53,7 @@ class EnvironmentVariables {
   @Max(7 * 24 * 60 * 60)
   NEST_JWT_EXPIRATION_TIME: number;
 
-  @IsUrl()
+  @IsString()
   NEST_GITHUB_CALLBACK_URL: string;
 
   @IsString()
@@ -65,7 +65,7 @@ class EnvironmentVariables {
   @IsString()
   NEST_POSTHOG_API_KEY: string;
 
-  @IsUrl()
+  @IsString()
   NEST_POSTHOG_HOST: string;
 }
 

@@ -1,6 +1,7 @@
 import { DynamicModule, Global, Module, Provider } from '@nestjs/common';
-import { PosthogModuleAsyncOptions, PosthogModuleOptions } from './analytics.interface';
+
 import { POSTHOG_OPTIONS } from './analytics.constants';
+import { PosthogModuleAsyncOptions, PosthogModuleOptions } from './analytics.interface';
 import { AnalyticsService } from './analytics.service';
 
 @Global()
