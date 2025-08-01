@@ -11,6 +11,6 @@ import { TwitchChatService } from './chat/chat.service';
 @Module({
   providers: [TwitchChatService, TwitchAuthService],
   imports: [ConfigModule, HttpModule, TypeOrmModule.forFeature([Token])],
-  exports: [TwitchChatService],
+  exports: [TwitchChatService, TwitchAuthService],
 })
 export class TwitchModule {}
