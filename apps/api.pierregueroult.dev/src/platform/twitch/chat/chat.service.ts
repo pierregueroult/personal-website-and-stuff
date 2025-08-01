@@ -1,6 +1,7 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import { EnvironmentVariables } from '../../../env.validation';
 import { TwitchAuthService } from '../auth/auth.service';
 
 @Injectable()
@@ -13,7 +14,7 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     private readonly twitchAuthService: TwitchAuthService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvironmentVariables>,
   ) {}
 
   async onModuleInit() {

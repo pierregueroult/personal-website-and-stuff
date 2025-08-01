@@ -15,7 +15,7 @@ enum Environment {
   Production = 'production',
 }
 
-class EnvironmentVariables {
+export class EnvironmentVariables {
   @IsEnum(Environment)
   NODE_ENV: Environment;
 
@@ -67,6 +67,26 @@ class EnvironmentVariables {
 
   @IsString()
   NEST_POSTHOG_HOST: string;
+
+  @IsString()
+  NEST_MAILER_HOST: string;
+
+  @IsNumber()
+  @Min(0)
+  @Max(65535)
+  NEST_MAILER_PORT: number;
+
+  @IsString()
+  NEST_MAILER_USER: string;
+
+  @IsString()
+  NEST_MAILER_PASS: string;
+
+  @IsString()
+  NEST_MAILER_FROM: string;
+
+  @IsString()
+  NODE_TLS_REJECT_UNAUTHORIZED: string = '1';
 }
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {

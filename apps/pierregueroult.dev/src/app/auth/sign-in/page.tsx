@@ -1,6 +1,8 @@
+import { Alert, AlertDescription, AlertTitle } from '@repo/ui/components/alert';
+
 import React from 'react';
+
 import { GitHubButton } from '@/components/auth/github-button';
-import { Alert, AlertTitle, AlertDescription } from '@repo/ui/components/alert';
 
 type SignInPageProps = {
   searchParams: Promise<{ error?: string }>;

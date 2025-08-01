@@ -8,6 +8,7 @@ import { Repository } from 'typeorm';
 
 import { Token } from '@repo/db/entities/token';
 
+import { EnvironmentVariables } from '../../../env.validation';
 import { TwitchTokenResponse } from './auth.interface';
 
 @Injectable()
@@ -15,7 +16,7 @@ export class TwitchAuthService {
   constructor(
     @InjectRepository(Token)
     private readonly tokenRepository: Repository<Token>,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvironmentVariables>,
     private readonly httpService: HttpService,
   ) {}
 

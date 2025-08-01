@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 
 import { User } from '@repo/db/entities/user';
 
+import { EnvironmentVariables } from '../env.validation';
 import { TwitchAuthService } from '../platform/twitch/auth/auth.service';
 import { Public } from './decorators/public.decorator';
 import { GithubGuard } from './guards/github.guard';
@@ -15,7 +16,7 @@ import { GithubGuard } from './guards/github.guard';
 export class AuthController {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvironmentVariables>,
     private readonly httpService: HttpService,
     private readonly twitchAuthService: TwitchAuthService,
   ) {}

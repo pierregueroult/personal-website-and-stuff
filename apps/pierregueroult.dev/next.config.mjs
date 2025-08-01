@@ -19,7 +19,7 @@ const nextConfig = {
         source: '/ingest/flags',
         destination: 'https://eu.i.posthog.com/flags',
       },
-    ]
+    ];
   },
   skipTrailingSlashRedirect: true,
 };

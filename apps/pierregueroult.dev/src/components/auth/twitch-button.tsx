@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@repo/ui/components/button';
-import { env } from '@/lib/env/client';
 import { TwitchIcon } from '@repo/ui/icons/twitch';
+
+import { useState } from 'react';
+
+import { env } from '@/lib/env/client';
 
 export function TwitchButton() {
   const [isLoading, setIsLoading] = useState(false);

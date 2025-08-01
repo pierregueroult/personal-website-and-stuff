@@ -8,6 +8,6 @@ type TwitchAdminLayoutProps = {
 
 export default async function Layout({ children }: TwitchAdminLayoutProps) {
   await getCurrentUserOrRedirect('/auth/sign-in');
-  
+
   return children;
 }

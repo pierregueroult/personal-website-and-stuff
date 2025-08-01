@@ -1,8 +1,9 @@
-import 'server-only';
+import { User } from '@repo/db/entities/user';
 
 import { redirect } from 'next/navigation';
 import { cache } from 'react';
-import { User } from '@repo/db/entities/user';
+import 'server-only';
+
 import { get } from '@/lib/fetch/server';
 
 enum AuthError {

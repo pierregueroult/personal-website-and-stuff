@@ -1,4 +1,9 @@
-import type { EventMessage, GroupIdentifyMessage, IdentifyMessage, PostHogOptions } from 'posthog-node';
+import type {
+  EventMessage,
+  GroupIdentifyMessage,
+  IdentifyMessage,
+  PostHogOptions,
+} from 'posthog-node';
 
 export interface PosthogModuleOptions {
   apiKey: string;
@@ -12,11 +17,11 @@ export interface PosthogModuleAsyncOptions {
   imports?: any[];
 }
 
-export type PosthogCaptureProps = EventMessage
+export type PosthogCaptureProps = EventMessage;
 
-export type PosthogIdentifyProps = IdentifyMessage
+export type PosthogIdentifyProps = IdentifyMessage;
 
-export type PosthogGroupIdentifyProps = GroupIdentifyMessage
+export type PosthogGroupIdentifyProps = GroupIdentifyMessage;
 
 export interface PosthogAliasProps {
   distinctId: string;

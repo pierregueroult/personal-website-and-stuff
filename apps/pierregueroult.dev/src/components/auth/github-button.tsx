@@ -1,9 +1,11 @@
 'use client';
 
-import { useState } from 'react';
 import { Button } from '@repo/ui/components/button';
-import { env } from '@/lib/env/client';
 import { GitHubIcon } from '@repo/ui/icons/github';
+
+import { useState } from 'react';
+
+import { env } from '@/lib/env/client';
 
 export function GitHubButton() {
   const [isLoading, setIsLoading] = useState(false);

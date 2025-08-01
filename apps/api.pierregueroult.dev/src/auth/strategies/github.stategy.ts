@@ -6,18 +6,19 @@ import { type Profile, Strategy } from 'passport-github2';
 
 import { User } from '@repo/db/entities/user';
 
+import { EnvironmentVariables } from '../../env.validation';
 import { UserService } from '../user/user.service';
 
 @Injectable()
 export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
   constructor(
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvironmentVariables>,
     private readonly userService: UserService,
   ) {
     super({
-      clientID: configService.get<string>('NEST_GITHUB_CLIENT_ID'),
-      clientSecret: configService.get<string>('NEST_GITHUB_CLIENT_SECRET'),
-      callbackURL: configService.get<string>('NEST_GITHUB_CALLBACK_URL'),
+      clientID: configService.get('NEST_GITHUB_CLIENT_ID'),
+      clientSecret: configService.get('NEST_GITHUB_CLIENT_SECRET'),
+      callbackURL: configService.get('NEST_GITHUB_CALLBACK_URL'),
       scope: ['user:email'],
     });
   }

@@ -6,6 +6,7 @@ import { AuthGuard } from '@nestjs/passport';
 
 import { Request } from 'express';
 
+import { EnvironmentVariables } from '../../env.validation';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { UserService } from '../user/user.service';
 
@@ -14,7 +15,7 @@ export class JwtGuard extends AuthGuard('jwt') {
   constructor(
     private readonly reflector: Reflector,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService,
+    private readonly configService: ConfigService<EnvironmentVariables>,
     private readonly userService: UserService,
   ) {
     super();
