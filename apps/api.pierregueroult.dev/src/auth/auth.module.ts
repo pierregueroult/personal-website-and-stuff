@@ -9,6 +9,7 @@ import { GithubStrategy } from './strategies/github.stategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from './user/user.module';
 import { HttpModule } from '@nestjs/axios';
+import { TwitchModule } from 'src/platform/twitch/twitch.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { HttpModule } from '@nestjs/axios';
     ConfigModule,
     HttpModule,
     UserModule,
+    TwitchModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
