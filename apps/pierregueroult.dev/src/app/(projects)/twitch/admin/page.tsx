@@ -1,3 +1,4 @@
+import React from 'react';
 import { TwitchButton } from '@/components/auth/twitch-button';
 
 export default function Page() {

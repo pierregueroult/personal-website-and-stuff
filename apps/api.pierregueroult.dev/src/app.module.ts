@@ -1,16 +1,20 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Token } from '@repo/db/entities/token';
 import { User } from '@repo/db/entities/user';
 
+import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
+import { JwtGuard } from './auth/guards/jwt.guard';
+import { UserModule } from './auth/user/user.module';
 import { ChatModule } from './chat/chat.module';
 import { validateEnvironment } from './env.validation';
-import { PlatformModule } from './platform/platform.module';
-import { AnalyticsModule } from './analytics/analytics.module';
 import { MailerModule } from './mailer/mailer.module';
+import { PlatformModule } from './platform/platform.module';
 
 @Module({
   imports: [
@@ -40,10 +44,16 @@ import { MailerModule } from './mailer/mailer.module';
     ChatModule,
     PlatformModule,
     AuthModule,
+    UserModule,
     AnalyticsModule,
     MailerModule,
+    JwtModule,
   ],
-  controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: JwtGuard,
+    },
+  ],
 })
 export class AppModule {}

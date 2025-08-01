@@ -1,15 +1,18 @@
+import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 
+import { TwitchModule } from 'src/platform/twitch/twitch.module';
+
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
+import { GithubGuard } from './guards/github.guard';
+import { JwtGuard } from './guards/jwt.guard';
 import { GithubStrategy } from './strategies/github.stategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from './user/user.module';
-import { HttpModule } from '@nestjs/axios';
-import { TwitchModule } from 'src/platform/twitch/twitch.module';
 
 @Module({
   imports: [
@@ -29,7 +32,7 @@ import { TwitchModule } from 'src/platform/twitch/twitch.module';
       }),
     }),
   ],
-  providers: [AuthService, JwtStrategy, GithubStrategy],
+  providers: [AuthService, JwtStrategy, GithubStrategy, JwtGuard, GithubGuard],
   controllers: [AuthController],
 })
-export class AuthModule {}
+export class AuthModule { }

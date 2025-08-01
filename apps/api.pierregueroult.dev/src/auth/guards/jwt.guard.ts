@@ -9,7 +9,7 @@ import { Request } from 'express';
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import { UserService } from '../user/user.service';
 
-Injectable();
+@Injectable()
 export class JwtGuard extends AuthGuard('jwt') {
   constructor(
     private readonly reflector: Reflector,

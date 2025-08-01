@@ -1,3 +1,4 @@
+import React from 'react';
 import { GitHubButton } from '@/components/auth/github-button';
 import { Alert, AlertTitle, AlertDescription } from '@repo/ui/components/alert';
 
