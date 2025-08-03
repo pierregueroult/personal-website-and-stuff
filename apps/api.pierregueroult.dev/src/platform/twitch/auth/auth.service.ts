@@ -31,14 +31,6 @@ export class TwitchAuthService {
     const now = new Date();
     const timeLeft = token.expiresAt.getTime() - now.getTime();
 
-    console.log('now:', now.toLocaleString());
-    console.log('token.expiresAt:', token.expiresAt.toLocaleString());
-    console.log(
-      'now + REFRESH_MARGIN:',
-      new Date(now.getTime() + this.REFRESH_MARGIN).toLocaleString(),
-    );
-    console.log('can be used :', timeLeft > this.REFRESH_MARGIN);
-
     if (timeLeft > this.REFRESH_MARGIN) {
       return token.accessToken;
     }

@@ -7,10 +7,11 @@ import { Token } from '@repo/db/entities/token';
 
 import { TwitchAuthService } from './auth/auth.service';
 import { TwitchChatService } from './chat/chat.service';
+import { ChatModule } from 'src/chat/chat.module';
 
 @Module({
   providers: [TwitchChatService, TwitchAuthService],
-  imports: [ConfigModule, HttpModule, TypeOrmModule.forFeature([Token])],
+  imports: [ConfigModule, HttpModule, TypeOrmModule.forFeature([Token]), ChatModule],
   exports: [TwitchChatService, TwitchAuthService],
 })
 export class TwitchModule {}
