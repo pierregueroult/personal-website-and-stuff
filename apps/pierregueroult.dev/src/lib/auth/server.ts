@@ -12,7 +12,7 @@ enum AuthError {
 }
 
 const fetchUserData = cache(async (): Promise<{ user: User | null; error: AuthError | null }> => {
-  const { ok, data } = await get<User>('/user/me', true);
+  const { ok, data } = await get<User>('/auth/me', true);
 
   if (!ok) {
     return { user: null, error: AuthError.FETCH_FAILED };

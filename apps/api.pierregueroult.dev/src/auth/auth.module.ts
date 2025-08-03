@@ -10,7 +10,7 @@ import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { GithubGuard } from './guards/github.guard';
 import { JwtGuard } from './guards/jwt.guard';
-import { GithubStrategy } from './strategies/github.stategy';
+import { GithubStrategy } from './strategies/github.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { UserModule } from './user/user.module';
 

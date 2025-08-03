@@ -1,6 +1,8 @@
 import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+import WebSocket, { type RawData } from 'ws';
+
 import { EnvironmentVariables } from '../../../env.validation';
 import { TwitchAuthService } from '../auth/auth.service';
 
@@ -30,45 +32,45 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
 
     let accessToken: string;
     try {
-      accessToken = await this.twitchAuthService.getAccessToken();
-    } catch {
-      this.logger.error('Could not connect to Twitch chat: Access token not available');
-      return;
-    }
+    accessToken = await this.twitchAuthService.getAccessToken();
+  } catch {
+    this.logger.error('Could not connect to Twitch chat: Access token not available');
+    return;
+  }
 
-    const channel = this.configService.get<string>('NEST_TWITCH_CHANNEL');
-    const username = this.configService.get<string>('NEST_TWITCH_USERNAME');
+  const channel = this.configService.get<string>('NEST_TWITCH_CHANNEL');
+  const username = this.configService.get<string>('NEST_TWITCH_USERNAME');
 
-    this.ws = new WebSocket(`wss://irc-ws.chat.twitch.tv:443`);
+  this.ws = new WebSocket(`wss://irc-ws.chat.twitch.tv:443`);
 
-    this.ws.onopen = () => {
-      this.isConnected = true;
+  this.ws.onopen = () => {
+    this.isConnected = true;
 
-      this.logger.log('WebSocket connection established');
-      this.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
-      this.send(`PASS oauth:${accessToken}`);
-      this.send(`NICK ${username}`);
-      this.send(`JOIN #${channel}`);
-    };
+    this.logger.log('WebSocket connection established');
+    this.send('CAP REQ :twitch.tv/tags twitch.tv/commands');
+    this.send(`PASS oauth:${accessToken}`);
+    this.send(`NICK ${username}`);
+    this.send(`JOIN #${channel}`);
+  };
 
-    this.ws.onmessage = (event: MessageEvent) => {
-      this.buffer += event.data;
-      const lines = this.buffer.split('\r\n');
-      this.buffer = lines.pop() || '';
-      for (const line of lines) {
-        this.handleReceivedLine(line);
+  this.ws.on('message', (event: RawData) => {
+    this.buffer += event.toString('utf-8');
+    const lines = this.buffer.split('\r\n');
+    this.buffer = lines.pop() || '';
+    for (const line of lines) {
+      this.handleReceivedLine(line);
       }
-    };
+    });
 
-    this.ws.onclose = () => {
+    this.ws.on('close', () => {
       this.isConnected = false;
       this.reconnect();
-    };
+    });
 
-    this.ws.onerror = (error: Event) => {
+    this.ws.on('error', (error) => {
       this.logger.error('WebSocket error:', error);
       this.reconnect();
-    };
+    });
   }
 
   private disconnect() {
@@ -115,7 +117,7 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
       const message = messageMatch ? messageMatch[1] : '';
 
       this.logger.log(
-        `Received message from ${username}: ${message} with tags: ${JSON.stringify(tags)}`,
+        `Received message from ${username}: ${message} with tags: ${JSON.stringify(tags)}`,`Here is the complete line: ${line}`
       );
       return;
     }

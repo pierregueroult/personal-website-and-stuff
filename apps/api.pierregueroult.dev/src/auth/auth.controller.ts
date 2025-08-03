@@ -1,5 +1,4 @@
-import { HttpService } from '@nestjs/axios';
-import { Controller, Get, HttpCode, HttpStatus, Param, Req, Res, UseGuards } from '@nestjs/common';
+import { Controller, Get, HttpCode, HttpStatus, Query, Req, Res, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -17,7 +16,6 @@ export class AuthController {
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService<EnvironmentVariables>,
-    private readonly httpService: HttpService,
     private readonly twitchAuthService: TwitchAuthService,
   ) {}
 
@@ -51,7 +49,9 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Get('twitch/callback')
-  async twitch(@Param('code') code: string, @Res() res: Response) {
+  async twitch(@Query('code') code: string, @Res() res: Response, @Req() req: Request) {
+    if (!code)
+      res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/?twitch=no_code`);
     try {
       await this.twitchAuthService.setAccessToken(code);
       return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/?twitch=success`);

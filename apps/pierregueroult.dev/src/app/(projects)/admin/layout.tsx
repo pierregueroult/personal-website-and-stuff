@@ -2,11 +2,11 @@ import { type ReactNode } from 'react';
 
 import { getCurrentUserOrRedirect } from '@/lib/auth/server';
 
-type TwitchAdminLayoutProps = {
+type AdminLayoutProps = {
   children: ReactNode;
 };
 
-export default async function Layout({ children }: TwitchAdminLayoutProps) {
+export default async function Layout({ children }: AdminLayoutProps) {
   await getCurrentUserOrRedirect('/auth/sign-in');
 
   return children;

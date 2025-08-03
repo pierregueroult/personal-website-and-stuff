@@ -3,12 +3,18 @@ import { Alert, AlertDescription, AlertTitle } from '@repo/ui/components/alert';
 import React from 'react';
 
 import { GitHubButton } from '@/components/auth/github-button';
+import { getCurrentUserOrNull }  from '@/lib/auth/server';
+import { redirect } from 'next/navigation';
 
 type SignInPageProps = {
   searchParams: Promise<{ error?: string }>;
 };
 
 export default async function SignInPage({ searchParams }: SignInPageProps) {
+  const user = await getCurrentUserOrNull();
+  if(user) return redirect('/admin');
+
+
   const error = (await searchParams).error;
 
   return (

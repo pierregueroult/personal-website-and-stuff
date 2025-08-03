@@ -5,6 +5,8 @@ export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const token = searchParams.get('token');
 
+  console.log(searchParams);
+
   if (!token) {
     return NextResponse.redirect(new URL('/auth/sign-in?error=github_auth_failed', request.url));
   }
@@ -19,5 +21,5 @@ export async function GET(request: NextRequest) {
     sameSite: 'lax',
   });
 
-  return NextResponse.redirect(new URL('/app', request.url));
+  return NextResponse.redirect(new URL('/admin', request.url));
 }

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
 
@@ -27,11 +27,17 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     const emails = profile.emails;
     const primaryEmail = emails && emails.length > 0 ? emails[0].value : null;
 
-    if (!primaryEmail) throw new Error('No primary email found in GitHub profile');
+    if (!primaryEmail) {
+      throw new Error('No primary email found in GitHub profile');
+    }
 
-    if (!this.userService.isEmailAuthorized(primaryEmail)) throw new Error('Email not authorized');
+    const isAuthorized = await this.userService.isEmailAuthorized(primaryEmail);
 
-    const user = await this.userService.findGithubUser(primaryEmail, profile.id);
+    if (!isAuthorized) {
+      throw new UnauthorizedException('Email not authorized');
+    }
+
+    const user = await this.userService.findUserByEmail(primaryEmail);
 
     if (user) return user;
 
