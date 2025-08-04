@@ -16,6 +16,7 @@ import { ChatModule } from './chat/chat.module';
 import { EnvironmentVariables, validateEnvironment } from './env.validation';
 import { MailerModule } from './mailer/mailer.module';
 import { PlatformModule } from './platform/platform.module';
+import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [
@@ -68,6 +69,7 @@ import { PlatformModule } from './platform/platform.module';
     AnalyticsModule,
     MailerModule,
     JwtModule,
+    HealthModule,
   ],
   providers: [
     {

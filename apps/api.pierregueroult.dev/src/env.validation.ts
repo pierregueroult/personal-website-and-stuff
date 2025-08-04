@@ -25,7 +25,13 @@ export class EnvironmentVariables {
   NEST_PORT: number;
 
   @Matches(/https?:\/\//)
-  NEST_CORS_ORIGIN: string;
+  NEST_FRONTEND_URL: string;
+
+  @Matches(/https?:\/\//)
+  NEST_BACKEND_URL: string;
+
+  @Matches(/https?:\/\//)
+  NEST_HOST_URL: string;
 
   @Matches(/mongodb\+srv:\/\//)
   NEST_DATABASE_URL: string;

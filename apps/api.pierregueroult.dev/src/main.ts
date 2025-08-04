@@ -13,9 +13,10 @@ async function bootstrap() {
   const config = app.get(ConfigService<EnvironmentVariables>);
 
   app.enableCors({
-    origin: config.get<string>('NEST_CORS_ORIGIN'),
+    origin: config.get<string>('NEST_FRONTEND_URL'),
     credentials: true,
   });
+  app.enableShutdownHooks();
   app.use(cookieParser());
   app.useGlobalPipes(
     new ValidationPipe({ whitelist: true, transform: true, forbidNonWhitelisted: true }),

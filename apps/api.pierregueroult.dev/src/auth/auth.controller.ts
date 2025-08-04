@@ -34,10 +34,10 @@ export class AuthController {
       const token = this.jwtService.sign({ email: (req.user as User).email });
 
       return res.redirect(
-        `${this.configService.get<string>('NEST_CORS_ORIGIN')}/auth/github/callback?token=${token}`,
+        `${this.configService.get<string>('NEST_FRONTEND_URL')}/auth/github/callback?token=${token}`,
       );
     } else {
-      return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/auth/sigin-in`);
+      return res.redirect(`${this.configService.get<string>('NEST_FRONTEND_URL')}/auth/sigin-in`);
     }
   }
 
@@ -51,12 +51,12 @@ export class AuthController {
   @Get('twitch/callback')
   async twitch(@Query('code') code: string, @Res() res: Response, @Req() req: Request) {
     if (!code)
-      res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/?twitch=no_code`);
+      res.redirect(`${this.configService.get<string>('NEST_FRONTEND_URL')}/?twitch=no_code`);
     try {
       await this.twitchAuthService.setAccessToken(code);
-      return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/?twitch=success`);
+      return res.redirect(`${this.configService.get<string>('NEST_FRONTEND_URL')}/?twitch=success`);
     } catch {
-      return res.redirect(`${this.configService.get<string>('NEST_CORS_ORIGIN')}/?twitch=error`);
+      return res.redirect(`${this.configService.get<string>('NEST_FRONTEND_URL')}/?twitch=error`);
     }
   }
 
