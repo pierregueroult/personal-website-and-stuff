@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, HttpCode } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import {
   DiskHealthIndicator,
@@ -10,6 +10,7 @@ import {
 } from '@nestjs/terminus';
 
 import { EnvironmentVariables } from '../env.validation';
+import { Public } from '../auth/decorators/public.decorator';
 
 @Controller('health')
 export class HealthController {
@@ -34,10 +35,10 @@ export class HealthController {
       async () =>
         this.httpIndicator.pingCheck(
           'backend deployment',
-          this.configService.get('NEST_BACKEND_URL'),
+          `${this.configService.get('NEST_BACKEND_URL')}/health`,
         ),
       async () =>
-        this.httpIndicator.pingCheck('host deployment', this.configService.get('NEST_HOST_URL')),
+        this.httpIndicator.responseCheck('host deployment', this.configService.get('NEST_HOST_URL'), (res) => res.status === 401),
       async () =>
         this.httpIndicator.pingCheck(
           'email service',
@@ -51,5 +52,12 @@ export class HealthController {
         }),
       async () => this.memoryIndicator.checkHeap('memory heap', 150 * 1024 * 1024),
     ]);
+  }
+
+  @Get()
+  @Public()
+  @HttpCode(200)
+  iAmHealthy() {
+    return { status: 'ok' };
   }
 }
