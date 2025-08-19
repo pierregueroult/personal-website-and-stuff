@@ -1,16 +1,20 @@
 import '@repo/ui/styles/globals.css';
 
-import { JetBrains_Mono } from 'next/font/google';
 import type { ReactNode } from 'react';
 
-type RootLayoutProps = Readonly<{ children: ReactNode }>;
+import { ThemeProvider } from '@/components/providers/theme-provider';
+import { accentFont, mainFont } from '@/lib/fonts';
 
-const mainFont = JetBrains_Mono({ subsets: ['latin'], variable: '--font-main' });
+type RootLayoutProps = Readonly<{ children: ReactNode }>;
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${mainFont.variable} ${mainFont.className} antialiased`}>{children}</body>
+      <body
+        className={`${mainFont.variable} ${accentFont.variable} ${mainFont.className} antialiased`}
+      >
+        <ThemeProvider>{children}</ThemeProvider>
+      </body>
     </html>
   );
 }

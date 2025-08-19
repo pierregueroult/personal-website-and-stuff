@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 
 import WebSocket, { type RawData } from 'ws';
 
-import { ChatGateway } from '../../../chat/chat.gateway';
+import { ChatService } from '../../../chat/chat.service';
 import { EnvironmentVariables } from '../../../env.validation';
 import { TwitchAuthService } from '../auth/auth.service';
 import {
@@ -15,7 +15,7 @@ import {
   TOKEN_CHECK_INTERVAL,
   TWITCH_IRC_URL,
 } from './chat.constants';
-import { ConnectionConfig, TwitchMessage, TwitchTags } from './chat.interface';
+import { ConnectionConfig,  TwitchTags } from './chat.interface';
 
 @Injectable()
 export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
@@ -38,7 +38,7 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly twitchAuthService: TwitchAuthService,
     private readonly configService: ConfigService<EnvironmentVariables>,
-    private readonly chatGateway: ChatGateway,
+    private readonly chatService: ChatService 
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -177,7 +177,6 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
   private handleReceivedLine(line: string): void {
     if (!line.length) return;
 
-    // Update last message time for any received line
     this.lastMessageTime = Date.now();
     this.logger.debug(`Received: ${line}`);
 
@@ -238,23 +237,13 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
 
   private handleChatMessage(line: string): void {
     try {
-      const message = this.parseChatMessage(line);
-      this.logger.log(`Received message from ${message.username}: ${message.message}`);
-      this.chatGateway.emitChatMessage('twitch', message.color, message.message, message.username);
+     this.chatService.sendTwitchChatMessage(line); 
     } catch (error) {
       this.logger.error('Failed to parse chat message', error, { line });
     }
   }
 
-  private parseChatMessage(line: string): TwitchMessage {
-    const username = this.getTag(line, 'display-name') || this.getTag(line, 'login') || 'Unknown';
-    const messageParts = line.split('PRIVMSG')[1]?.split(':');
-    const message = messageParts?.slice(1).join(':') || '';
-    const color = this.getTag(line, 'color') || '#000000';
-
-    return { username, message, color };
-  }
-
+  
   private handleNoticeMessage(line: string): void {
     this.logger.warn(`Received notice: ${line}`);
 
