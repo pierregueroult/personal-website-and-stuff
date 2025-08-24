@@ -18,7 +18,7 @@ export default function ProjectSlider() {
 
   return (
     <div
-      className="py-sm pb-xl flex w-screen overflow-x-hidden px-[calc(50%-40vw)]  md:px-[calc(50%-15vw)]"
+      className="py-sm pb-xl flex w-screen overflow-x-hidden px-[calc(50%-40vw)] md:px-[calc(50%-15vw)]"
       ref={ref}
     >
       {slides.map((slide, i) => (

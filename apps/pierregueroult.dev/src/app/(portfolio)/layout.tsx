@@ -1,4 +1,3 @@
-
 import LenisProvider from '@/components/providers/lenis-provider';
 
 export default function PortfolioRootLayout({ children }: LayoutProps<'/'>) {
