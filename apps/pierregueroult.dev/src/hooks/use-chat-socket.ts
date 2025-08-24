@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react';
 
 import { socket } from '@/sockets/chat';
 
-export function useChatSocket(): { messages: string[]; isConnected: boolean, handleConnection: () => void } {
+export function useChatSocket(): {
+  messages: string[];
+  isConnected: boolean;
+  handleConnection: () => void;
+} {
   const [messages, setMessages] = useState<string[]>([]);
   const [isConnected, setIsConnected] = useState<boolean>(socket.connected);
 
@@ -29,7 +33,7 @@ export function useChatSocket(): { messages: string[]; isConnected: boolean, han
     if (!socket.connected) {
       socket.connect();
     }
-  }
+  };
 
-  return { messages, isConnected , handleConnection};
+  return { messages, isConnected, handleConnection };
 }

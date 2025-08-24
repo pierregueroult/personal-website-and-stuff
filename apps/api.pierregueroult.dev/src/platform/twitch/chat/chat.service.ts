@@ -15,7 +15,7 @@ import {
   TOKEN_CHECK_INTERVAL,
   TWITCH_IRC_URL,
 } from './chat.constants';
-import { ConnectionConfig,  TwitchTags } from './chat.interface';
+import { ConnectionConfig, TwitchTags } from './chat.interface';
 
 @Injectable()
 export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
@@ -38,7 +38,7 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
   constructor(
     private readonly twitchAuthService: TwitchAuthService,
     private readonly configService: ConfigService<EnvironmentVariables>,
-    private readonly chatService: ChatService 
+    private readonly chatService: ChatService,
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -237,13 +237,12 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
 
   private handleChatMessage(line: string): void {
     try {
-     this.chatService.sendTwitchChatMessage(line); 
+      this.chatService.sendTwitchChatMessage(line);
     } catch (error) {
       this.logger.error('Failed to parse chat message', error, { line });
     }
   }
 
-  
   private handleNoticeMessage(line: string): void {
     this.logger.warn(`Received notice: ${line}`);
 

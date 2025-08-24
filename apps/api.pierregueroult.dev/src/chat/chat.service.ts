@@ -6,7 +6,7 @@ import { ChatGateway } from './chat.gateway';
 
 @Injectable()
 export class ChatService {
-  constructor(private readonly chatGateway: ChatGateway) { }
+  constructor(private readonly chatGateway: ChatGateway) {}
 
   sendTwitchChatMessage(line: string): void {
     const chatMessage = this.convertTwitchLineToChatMessage(line);

@@ -179,7 +179,7 @@
     @apply my-6 ml-6 list-disc;
   }
 
-  .typography-list>li {
+  .typography-list > li {
     @apply mt-2;
   }
 

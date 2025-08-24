@@ -9,8 +9,8 @@ import {
   TypeOrmHealthIndicator,
 } from '@nestjs/terminus';
 
-import { EnvironmentVariables } from '../env.validation';
 import { Public } from '../auth/decorators/public.decorator';
+import { EnvironmentVariables } from '../env.validation';
 
 @Controller('health')
 export class HealthController {
@@ -38,7 +38,11 @@ export class HealthController {
           `${this.configService.get('NEST_BACKEND_URL')}/health`,
         ),
       async () =>
-        this.httpIndicator.responseCheck('host deployment', this.configService.get('NEST_HOST_URL'), (res) => res.status === 401),
+        this.httpIndicator.responseCheck(
+          'host deployment',
+          this.configService.get('NEST_HOST_URL'),
+          (res) => res.status === 401,
+        ),
       async () =>
         this.httpIndicator.pingCheck(
           'email service',

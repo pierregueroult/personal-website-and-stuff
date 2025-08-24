@@ -14,9 +14,9 @@ import { JwtGuard } from './auth/guards/jwt.guard';
 import { UserModule } from './auth/user/user.module';
 import { ChatModule } from './chat/chat.module';
 import { EnvironmentVariables, validateEnvironment } from './env.validation';
+import { HealthModule } from './health/health.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PlatformModule } from './platform/platform.module';
-import { HealthModule } from './health/health.module';
 
 @Module({
   imports: [

@@ -49,7 +49,6 @@ export class UserService {
 
       return authorized !== null;
     } catch {
-
       return false;
     }
   }

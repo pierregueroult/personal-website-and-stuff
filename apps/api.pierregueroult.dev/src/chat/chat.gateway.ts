@@ -1,7 +1,8 @@
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
-import type { ChatMessage } from '@repo/db/types/chat/chat.interface';
 
 import type { Server } from 'socket.io';
+
+import type { ChatMessage } from '@repo/db/types/chat/chat.interface';
 
 @WebSocketGateway()
 export class ChatGateway {
@@ -9,6 +10,6 @@ export class ChatGateway {
   server: Server;
 
   emitChatMessage(chatMessage: ChatMessage): void {
-    this.server.emit('chat', chatMessage); 
+    this.server.emit('chat', chatMessage);
   }
 }
