@@ -1,13 +1,9 @@
 import '@repo/ui/styles/globals.css';
 
-import type { ReactNode } from 'react';
-
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { accentFont, mainFont } from '@/lib/fonts';
 
-type RootLayoutProps = Readonly<{ children: ReactNode }>;
-
-export default function RootLayout({ children }: RootLayoutProps) {
+export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body

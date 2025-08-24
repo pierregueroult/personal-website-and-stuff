@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   transpilePackages: ['@repo/ui'],
+  typedRoutes: true,
   experimental: {
     reactCompiler: true,
   },

@@ -1,12 +1,6 @@
-import { type ReactNode } from 'react';
-
 import { getCurrentUserOrRedirect } from '@/lib/auth/server';
 
-type AdminLayoutProps = {
-  children: ReactNode;
-};
-
-export default async function Layout({ children }: AdminLayoutProps) {
+export default async function Layout({ children }: LayoutProps<'/admin'>) {
   await getCurrentUserOrRedirect('/auth/sign-in');
 
   return children;
