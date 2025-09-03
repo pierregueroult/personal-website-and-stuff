@@ -5,13 +5,18 @@ import { JwtModule } from '@nestjs/jwt';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
-import { Token } from '@repo/db/entities/token';
-import { User } from '@repo/db/entities/user';
+import { Token } from '@repo/db/entities/auth/token';
+import { User } from '@repo/db/entities/auth/user';
+import { Category } from '@repo/db/entities/blog/category';
+import { Comment } from '@repo/db/entities/blog/comment';
+import { Post } from '@repo/db/entities/blog/post';
+import { Tag } from '@repo/db/entities/blog/tag';
 
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
 import { UserModule } from './auth/user/user.module';
+import { BlogModule } from './blog/blog.module';
 import { ChatModule } from './chat/chat.module';
 import { EnvironmentVariables, validateEnvironment } from './env.validation';
 import { HealthModule } from './health/health.module';
@@ -46,7 +51,7 @@ import { PlatformModule } from './platform/platform.module';
       useFactory: async (configService: ConfigService<EnvironmentVariables>) => ({
         type: 'mongodb',
         url: configService.get('NEST_DATABASE_URL'),
-        entities: [Token, User],
+        entities: [Token, User, Post, Comment, Tag, Category],
         logging: true,
         autoLoadEntities: true,
         synchronize: configService.get('NODE_ENV') !== 'production',
@@ -70,6 +75,7 @@ import { PlatformModule } from './platform/platform.module';
     MailerModule,
     JwtModule,
     HealthModule,
+    BlogModule,
   ],
   providers: [
     {

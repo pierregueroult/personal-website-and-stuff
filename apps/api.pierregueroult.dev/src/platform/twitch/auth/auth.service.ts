@@ -6,7 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { AxiosResponse } from 'axios';
 import { Repository } from 'typeorm';
 
-import { Token } from '@repo/db/entities/token';
+import { Token } from '@repo/db/entities/auth/token';
 
 import { EnvironmentVariables } from '../../../env.validation';
 import { TwitchTokenResponse } from './auth.interface';

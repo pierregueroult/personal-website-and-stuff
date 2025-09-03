@@ -4,7 +4,7 @@ import { JwtService } from '@nestjs/jwt';
 
 import { Request, Response } from 'express';
 
-import { User } from '@repo/db/entities/user';
+import { User } from '@repo/db/entities/auth/user';
 
 import { EnvironmentVariables } from '../env.validation';
 import { TwitchAuthService } from '../platform/twitch/auth/auth.service';

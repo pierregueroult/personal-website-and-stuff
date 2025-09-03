@@ -11,7 +11,7 @@ export default function Home() {
       <section className="min-h-screen">
         here is the resume with skills education experience ...
       </section>
-      <section className="min-h-screen">
+      <section className="py-16">
         <ProjectSlider />
       </section>
     </Fragment>

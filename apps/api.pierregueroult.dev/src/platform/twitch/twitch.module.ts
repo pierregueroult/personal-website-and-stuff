@@ -5,7 +5,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { ChatModule } from 'src/chat/chat.module';
 
-import { Token } from '@repo/db/entities/token';
+import { Token } from '@repo/db/entities/auth/token';
 
 import { TwitchAuthService } from './auth/auth.service';
 import { TwitchChatService } from './chat/chat.service';

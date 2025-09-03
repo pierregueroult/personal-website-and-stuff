@@ -1,20 +1,14 @@
 'use client';
 
-import { useEffect } from 'react';
-
 import { useSmooothy } from '@/hooks/use-smoothy';
 
 const slides = Array.from({ length: 10 }).map((_, i) => i);
 
 export default function ProjectSlider() {
-  const { ref, slider } = useSmooothy({
+  const { ref } = useSmooothy({
     infinite: true,
     snap: true,
   });
-
-  useEffect(() => {
-    console.log(slider);
-  }, [slider]);
 
   return (
     <div
