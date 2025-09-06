@@ -1,5 +1,3 @@
-import { Post } from 'entities/blog/post';
-import { Role } from 'enum/auth/role';
 import {
   Column,
   CreateDateColumn,
@@ -8,6 +6,9 @@ import {
   OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
+
+import { Role } from '../../enum/auth/role';
+import { Post } from '../blog/post';
 
 @Entity()
 export class User {

@@ -1,5 +1,5 @@
 {
-  "name": "@repo/db",
+  "name": "@repo/i18n",
   "version": "1.0.0",
   "files": [
     "./dist/**"
@@ -22,19 +22,12 @@
     "lint": "eslint . --max-warnings 0",
     "format": "prettier --write . --ignore-unknown"
   },
-  "dependencies": {
-    "ai": "^5.0.30",
-    "class-transformer": "^0.5.1",
-    "class-validator": "^0.14.2",
-    "typeorm": "^0.3.25",
-    "@repo/i18n": "workspace:*"
-  },
   "devDependencies": {
+    "@types/node": "^24.3.1",
     "@repo/eslint-config": "workspace:*",
     "@repo/prettier-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
-    "@types/node": "^24.0.12",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "exports": {
     ".": {

@@ -22,6 +22,8 @@ import { EnvironmentVariables, validateEnvironment } from './env.validation';
 import { HealthModule } from './health/health.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PlatformModule } from './platform/platform.module';
+import { AiModule } from './ai/ai.module';
+import { LanguageModule } from './language/language.module';
 
 @Module({
   imports: [
@@ -76,6 +78,8 @@ import { PlatformModule } from './platform/platform.module';
     JwtModule,
     HealthModule,
     BlogModule,
+    AiModule,
+    LanguageModule,
   ],
   providers: [
     {

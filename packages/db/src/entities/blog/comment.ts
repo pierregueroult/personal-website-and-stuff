@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, ManyToOne, ObjectIdColumn, OneToMany, UpdateDateColumn } from 'typeorm';
 import { Post } from './post';
-import { User } from 'entities/auth/user';
-import { CommentStatus } from 'enum/blog/status';
+import { User } from '../../entities/auth/user';
+import { CommentStatus } from '../../enum/blog/status';
 
 @Entity()
 export class Comment {

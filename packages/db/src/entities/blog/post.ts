@@ -1,5 +1,5 @@
-import { User } from 'entities/auth/user';
-import { PostStatus } from 'enum/blog/status';
+import { User } from '../auth/user';
+import { PostStatus } from '../../enum/blog/status';
 import {
   Column,
   CreateDateColumn,
