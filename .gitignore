@@ -27,6 +27,8 @@ out/
 build
 dist
 
+.kiro
+
 
 # Debug
 npm-debug.log*

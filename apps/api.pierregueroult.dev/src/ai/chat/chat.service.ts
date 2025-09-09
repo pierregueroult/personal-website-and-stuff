@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 
 import { UIMessage, convertToModelMessages, stepCountIs, streamText } from 'ai';
-import { LanguageService } from 'src/language/language.service';
+import { LanguageService } from '../../language/language.service';
 
-import { mistral } from '@ai-sdk/mistral';
+import { type MistralLanguageModelOptions, mistral } from '@ai-sdk/mistral';
 import { type Locale } from '@repo/i18n/locales';
 
 @Injectable()
@@ -65,6 +65,11 @@ export class ChatService {
       model: mistral('mistral-small-latest'),
       messages: convertToModelMessages(messages),
       stopWhen: stepCountIs(5),
+      providerOptions: {
+        mistral: {
+          safePrompt: true,
+        } satisfies MistralLanguageModelOptions,
+      },
     });
 
     return result.toUIMessageStreamResponse();

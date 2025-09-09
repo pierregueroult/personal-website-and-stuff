@@ -22,7 +22,7 @@ export default async function RootLayout({ children, params }: LayoutProps<'/[lo
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} suppressHydrationWarning className=''>
       <body
         className={`${mainFont.variable} ${accentFont.variable} ${mainFont.className} antialiased`}
       >

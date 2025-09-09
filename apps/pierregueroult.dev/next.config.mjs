@@ -8,6 +8,9 @@ const nextConfig = {
     reactCompiler: true,
   },
   poweredByHeader: false,
+  devIndicators: {
+    position: 'bottom-right',
+  },
   async rewrites() {
     return [
       {
@@ -29,4 +32,4 @@ const nextConfig = {
 
 const withNextIntl = createNextIntlPlugin();
 
-export default withNextIntl(nextConfig); 
+export default withNextIntl(nextConfig);
