@@ -1,0 +1,7 @@
+[submodule "packages/content/public"]
+	path = packages/content/public
+	url = ../notes-public
+
+[submodule "packages/content/private"]
+	path = packages/content/private
+	url = ../notes-private
