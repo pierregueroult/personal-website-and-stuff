@@ -11,8 +11,13 @@ export class BlogController {
   constructor(private readonly blogService: BlogService) {}
 
   @Public()
-  @Get(':slug')
+  @Get('public/:slug')
   async getBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
     return this.blogService.getBlogContentBySlug(slug);
+  }
+
+  @Get('private/:slug')
+  async getPrivateBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
+    return this.blogService.getPrivateBlogContentBySlug(slug);
   }
 }

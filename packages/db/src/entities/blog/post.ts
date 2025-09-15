@@ -1,5 +1,3 @@
-import { User } from '../auth/user';
-import { PostStatus } from '../../enum/blog/status';
 import {
   Column,
   CreateDateColumn,
@@ -11,6 +9,8 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
+import { PostStatus } from '../../enum/blog/status';
+import { User } from '../auth/user';
 import { Category } from './category';
 import { Comment } from './comment';
 import { Tag } from './tag';
@@ -37,12 +37,6 @@ export class Post {
 
   @Column({ unique: true })
   slug: string;
-
-  @Column('text')
-  content: string;
-
-  @Column({ nullable: true, type: 'text' })
-  excerpt: string;
 
   @Column({ type: 'enum', enum: PostStatus, default: PostStatus.DRAFT })
   status: PostStatus;
