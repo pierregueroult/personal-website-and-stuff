@@ -1,9 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-
+import * as fs from 'fs/promises';
 import { Repository } from 'typeorm';
 
 import { Post } from '@repo/db/entities/blog/post';
+import { ContentResponse, ContentVisibility } from '@repo/db/types/blog/blog.interface';
 
 @Injectable()
 export class BlogService {
@@ -12,27 +13,24 @@ export class BlogService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  async getBlogContentBySlug(slug: string): Promise<Partial<Post> & { content: string }> {
-    const post = await this.postRepository.findOne({
-      where: { slug },
-    });
+  async getBlogContentBySlug(
+    slug: string,
+    requestedVisibility: ContentVisibility,
+  ): Promise<ContentResponse> {
+    const databaseData = await this.postRepository.findOne({
+        where: { slug },
+        relations: ['comments', 'categories', 'tags']
+    })
 
-    if (!post) throw new NotFoundException('Post not found');
-
-    const postContent = await import(`@repo/content/public/${slug}.md`);
-
-    return { ...post, content: postContent.default };
+    const markdownData = await this.readMarkdownFile(slug); 
   }
 
-  async getPrivateBlogContentBySlug(slug: string): Promise<Partial<Post> & { content: string }> {
-    const post = await this.postRepository.findOne({
-      where: { slug },
-    });
+  async readMarkdownFile(slug: string): Promise<string> {
+    try {
+      const filePath = `../../../packages/content/${slug}.md`;
+      const fileContent = await fs.readFile(filePath, 'utf-8');
+      const stats = await fs.stat(filePath);
 
-    if (!post) throw new NotFoundException('Post not found or is not private');
-
-    const postContent = await import(`@repo/content/private/${slug}.md`);
-
-    return { ...post, content: postContent.default };
-  }
+      const { data: frontMatter, content } = matter(fileContent);
+    }
 }

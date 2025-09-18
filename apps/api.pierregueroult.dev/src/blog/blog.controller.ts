@@ -13,11 +13,16 @@ export class BlogController {
   @Public()
   @Get('public/:slug')
   async getBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
-    return this.blogService.getBlogContentBySlug(slug);
+    return {};
   }
 
   @Get('private/:slug')
   async getPrivateBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
-    return this.blogService.getPrivateBlogContentBySlug(slug);
+    return {};
+  }
+
+  @Get('unlisted/:slug')
+  async getUnlistedBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
+    return {};
   }
 }
