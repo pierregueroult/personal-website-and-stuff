@@ -1,14 +1,27 @@
+import { MDXRemoteOptions } from 'next-mdx-remote-client/rsc';
 import { rehypeAccessibleEmojis } from 'rehype-accessible-emojis';
-import rehypeExternalLinks from 'rehype-external-links';
-import rehypePrettyCode from 'rehype-pretty-code';
+import rehypeExternalLinks, { Options as RehypeExternalLinksOptions } from 'rehype-external-links';
+import rehypePrettyCode, { Options as RehypePrettyCodeOptions } from 'rehype-pretty-code';
 import remarkGfm from 'remark-gfm';
 import remarkToc from 'remark-toc';
 
-export const mdxOptions = {
-  remarkPlugins: [remarkGfm, remarkToc],
-  rehypePlugins: [
-    [rehypePrettyCode, { theme: 'catppuccin-macchiato', keepbackground: true }],
-    [rehypeAccessibleEmojis, { ignore: ['title', 'script', 'style', 'svg', 'math'] }],
-    [rehypeExternalLinks, { target: '_blank', rel: ['nofollow', 'noopener', 'noreferrer'] }],
-  ],
+const rehypePrettyCodeOptions: RehypePrettyCodeOptions = {
+  theme: 'catppuccin-macchiato',
+  keepBackground: true,
+};
+
+const rehypeExternalLinksOptions: RehypeExternalLinksOptions = {
+  target: '_blank',
+  rel: ['nofollow', 'noopener', 'noreferrer'],
+};
+
+export const options: MDXRemoteOptions = {
+  mdxOptions: {
+    remarkPlugins: [remarkGfm, remarkToc],
+    rehypePlugins: [
+      [rehypePrettyCode, rehypePrettyCodeOptions],
+      rehypeAccessibleEmojis,
+      [rehypeExternalLinks, rehypeExternalLinksOptions],
+    ],
+  },
 };

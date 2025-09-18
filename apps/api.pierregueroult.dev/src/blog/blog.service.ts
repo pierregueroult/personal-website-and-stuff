@@ -4,16 +4,17 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { createHash } from 'crypto';
 import * as fs from 'fs/promises';
 import matter from 'gray-matter';
-import { createRequire } from 'module';
+import { decompressFromBase64 } from 'lz-string';
 import { dirname, resolve } from 'path';
 import { Repository } from 'typeorm';
 
 import { Post } from '@repo/db/entities/blog/post';
 import { PostVisibility } from '@repo/db/enum/blog/status';
 import type {
+  BlogResponse,
   ContentFrontMatter,
-  ContentResponse,
   ContentVisibility,
+  ExcalidrawJson,
   MarkdownContent,
 } from '@repo/db/types/blog/blog.interface';
 
@@ -33,7 +34,7 @@ export class BlogService {
   async getBlogContentBySlug(
     slug: string,
     requestedVisibility: ContentVisibility,
-  ): Promise<ContentResponse> {
+  ): Promise<BlogResponse> {
     const databaseData = await this.postRepository.findOne({
       where: { slug },
       relations: ['comments', 'categories', 'tags'],
@@ -56,6 +57,28 @@ export class BlogService {
 
     if (content.visibility !== requestedVisibility) {
       throw new ForbiddenException(`You do not have access to this blog post.`);
+    }
+
+    if (markdownData.frontMatter.tags?.includes('excalidraw')) {
+      try {
+        const compressedJsonDrawing = markdownData.content
+          .split('```compressed-json')[1]
+          .split('```')[0];
+
+        const result = this.decompressDrawing(compressedJsonDrawing);
+
+        return {
+          slug: content.slug,
+          frontMatter: markdownData.frontMatter,
+          drawing: result,
+          database: {
+            id: content._id,
+            ...content,
+          },
+        };
+      } catch (error) {
+        throw new Error(`Error parsing excalidraw drawing in markdown: ${error}`);
+      }
     }
 
     return {
@@ -125,5 +148,25 @@ export class BlogService {
     const contentPackageDir = dirname(packageJsonPath);
 
     return resolve(contentPackageDir, 'blog');
+  }
+
+  private decompressDrawing(compressedData: string): ExcalidrawJson {
+    let cleanedData = '';
+    const length = compressedData.length;
+    for (let i = 0; i < length; i++) {
+      const char = compressedData[i];
+      if (char !== '\n' && char !== '\r') {
+        cleanedData += char;
+      }
+    }
+    const resultAsString = decompressFromBase64(cleanedData);
+    if (!resultAsString) throw new Error('The drawing data is corrupted or invalid.');
+
+    try {
+      const result = JSON.parse(resultAsString);
+      return result;
+    } catch {
+      throw new Error('The drawing data is corrupted or invalid.');
+    }
   }
 }

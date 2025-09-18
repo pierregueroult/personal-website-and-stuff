@@ -23,11 +23,12 @@
     "format": "prettier --write . --ignore-unknown"
   },
   "dependencies": {
+    "@excalidraw/excalidraw": "^0.18.0",
+    "@repo/i18n": "workspace:*",
     "ai": "^5.0.30",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.14.2",
-    "typeorm": "^0.3.25",
-    "@repo/i18n": "workspace:*"
+    "typeorm": "^0.3.25"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

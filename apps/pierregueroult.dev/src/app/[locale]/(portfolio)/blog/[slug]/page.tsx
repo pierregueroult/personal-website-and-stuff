@@ -1,16 +1,43 @@
-import type { ContentResponse } from '@repo/db/types/blog/blog.interface';
+import type { BlogResponse } from '@repo/db/types/blog/blog.interface';
 
 import { MDXRemote } from 'next-mdx-remote-client/rsc';
 import { notFound } from 'next/navigation';
+import Script from 'next/script';
+import { Suspense } from 'react';
 
+import ExcalidrawWithClientOnly from '@/components/blog/excalidraw';
 import { get } from '@/lib/fetch/server';
-import { mdxOptions } from '@/mdx-options';
+import { options } from '@/mdx-options';
+
+const ErrorComponent = () => <div>Error loading content</div>;
 
 export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[slug]'>) {
   const slug = (await props.params).slug;
 
-  const { ok, data } = await get<ContentResponse>(`/blog/public/${slug}`, false);
+  const { ok, data } = await get<BlogResponse>(`/blog/public/${slug}`, false);
   if (!ok) return notFound();
 
-  return <MDXRemote source={data.content} options={{ mdxOptions }} />;
+  if ('content' in data) {
+    return (
+      <Suspense fallback={<div>Loading...</div>}>
+        <MDXRemote source={data.content} options={options} onError={ErrorComponent} />
+      </Suspense>
+    );
+  }
+
+  if ('drawing' in data) {
+    return (
+      <>
+        <Script id="load-env-variables" strategy="beforeInteractive">
+          {`window["EXCALIDRAW_ASSET_PATH"] = window.origin;`}
+        </Script>
+
+        <div className="h-[80vh] w-full">
+          <ExcalidrawWithClientOnly initialData={data.drawing} viewModeEnabled/>
+        </div>
+      </>
+    );
+  }
+
+  throw new Error('Unknown content type');
 }
