@@ -17,7 +17,7 @@ export function Header() {
             <Link href="/#projects">Projects</Link>
           </li>
           <li>
-            <Link href="/#blog">Blog</Link>
+            <Link href="/blog">Blog</Link>
           </li>
           <li>
             <Link href="/links?origin=portfolio">Socials</Link>

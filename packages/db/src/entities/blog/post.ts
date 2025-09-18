@@ -9,7 +9,7 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-import { PostStatus } from '../../enum/blog/status';
+import { PostVisibility } from '../../enum/blog/status';
 import { User } from '../auth/user';
 import { Category } from './category';
 import { Comment } from './comment';
@@ -35,14 +35,14 @@ export class Post {
   @Column()
   title: string;
 
+  @Column()
+  fileHash: string;
+
+  @Column({ type: 'enum', enum: PostVisibility, default: PostVisibility.PRIVATE })
+  visibility: PostVisibility;
+
   @Column({ unique: true })
   slug: string;
-
-  @Column({ type: 'enum', enum: PostStatus, default: PostStatus.DRAFT })
-  status: PostStatus;
-
-  @Column({ nullable: true, type: 'timestamp' })
-  publishedAt: Date;
 
   @CreateDateColumn()
   createdAt: Date;

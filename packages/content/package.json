@@ -1,0 +1,9 @@
+{
+  "name": "@repo/content",
+  "version": "1.0.0",
+  "private": true,
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.14.0"
+}

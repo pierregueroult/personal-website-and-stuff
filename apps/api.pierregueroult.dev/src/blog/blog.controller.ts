@@ -1,9 +1,8 @@
 import { Controller, Get, Param } from '@nestjs/common';
 
-import { Public } from 'src/auth/decorators/public.decorator';
-
 import { Post } from '@repo/db/entities/blog/post';
 
+import { Public } from '../auth/decorators/public.decorator';
 import { BlogService } from './blog.service';
 
 @Controller('blog')
@@ -13,16 +12,16 @@ export class BlogController {
   @Public()
   @Get('public/:slug')
   async getBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
-    return {};
+    return this.blogService.getBlogContentBySlug(slug, 'public');
   }
 
   @Get('private/:slug')
   async getPrivateBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
-    return {};
+    return this.blogService.getBlogContentBySlug(slug, 'private');
   }
 
   @Get('unlisted/:slug')
   async getUnlistedBlogContentBySlug(@Param('slug') slug: string): Promise<Partial<Post>> {
-    return {};
+    return this.blogService.getBlogContentBySlug(slug, 'unlisted');
   }
 }
