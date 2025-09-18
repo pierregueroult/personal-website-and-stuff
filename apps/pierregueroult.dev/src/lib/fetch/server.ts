@@ -7,10 +7,16 @@ import { env } from '../env/client';
 type FetchResult<T> = FetchSuccess<T> | FetchError;
 
 type BackendError = unknown;
-type FetchSuccess<T> = { ok: true; data: T; response: ResponseOk };
+type FetchSuccess<T> = { ok: true; data: T; response: ResponseOk; code: number };
 type ResponseOk = Response & { ok: true };
 type ResponseError = Response & { ok: false; statusText: string; status: number };
-type FetchError = { ok: false; error: string; response: ResponseError; data: BackendError };
+type FetchError = {
+  ok: false;
+  error: string;
+  response: ResponseError;
+  data: BackendError;
+  code: number;
+};
 
 const baseFetch = async <T = object>(
   path: string,
@@ -37,8 +43,14 @@ const baseFetch = async <T = object>(
   const json = await response.json().catch(() => ({}));
 
   return response.ok
-    ? { ok: true, data: json as T, response }
-    : { ok: false, error: response.statusText, response, data: json as BackendError };
+    ? { ok: true, data: json as T, response, code: response.status }
+    : {
+        ok: false,
+        error: response.statusText,
+        response,
+        data: json as BackendError,
+        code: response.status,
+      };
 };
 
 const get = cache(async <T = object>(path: string, auth = false): Promise<FetchResult<T>> => {

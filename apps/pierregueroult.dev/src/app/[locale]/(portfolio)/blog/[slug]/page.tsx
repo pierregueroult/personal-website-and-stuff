@@ -1,7 +1,7 @@
 import type { BlogResponse } from '@repo/db/types/blog/blog.interface';
 
 import { MDXRemote } from 'next-mdx-remote-client/rsc';
-import { notFound } from 'next/navigation';
+import { forbidden, notFound, unauthorized } from 'next/navigation';
 import Script from 'next/script';
 import { Suspense } from 'react';
 
@@ -14,8 +14,12 @@ const ErrorComponent = () => <div>Error loading content</div>;
 export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[slug]'>) {
   const slug = (await props.params).slug;
 
-  const { ok, data } = await get<BlogResponse>(`/blog/public/${slug}`, false);
-  if (!ok) return notFound();
+  const { ok, data, code } = await get<BlogResponse>(`/blog/${slug}`, false);
+
+  if (!ok && code === 404) return notFound();
+  if (!ok && code === 401) return unauthorized();
+  if (!ok && code === 403) return forbidden();
+  if (!ok) throw new Error('Internal server error');
 
   if ('content' in data) {
     return (
@@ -31,9 +35,8 @@ export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[s
         <Script id="load-env-variables" strategy="beforeInteractive">
           {`window["EXCALIDRAW_ASSET_PATH"] = window.origin;`}
         </Script>
-
         <div className="h-[80vh] w-full">
-          <ExcalidrawWithClientOnly initialData={data.drawing} viewModeEnabled/>
+          <ExcalidrawWithClientOnly initialData={data.drawing} viewModeEnabled />
         </div>
       </>
     );

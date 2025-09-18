@@ -6,6 +6,7 @@ const nextConfig = {
   typedRoutes: true,
   experimental: {
     reactCompiler: true,
+    authInterrupts: true,
   },
   poweredByHeader: false,
   devIndicators: {

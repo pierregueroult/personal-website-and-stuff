@@ -8,6 +8,7 @@ import { decompressFromBase64 } from 'lz-string';
 import { dirname, resolve } from 'path';
 import { Repository } from 'typeorm';
 
+import { User } from '@repo/db/entities/auth/user';
 import { Post } from '@repo/db/entities/blog/post';
 import { PostVisibility } from '@repo/db/enum/blog/status';
 import type {
@@ -31,16 +32,21 @@ export class BlogService {
     private readonly postRepository: Repository<Post>,
   ) {}
 
-  async getBlogContentBySlug(
-    slug: string,
-    requestedVisibility: ContentVisibility,
-  ): Promise<BlogResponse> {
+  async getBlogContentBySlug(slug: string, user: User | null): Promise<BlogResponse> {
     const databaseData = await this.postRepository.findOne({
       where: { slug },
       relations: ['comments', 'categories', 'tags'],
     });
 
     const markdownData = await this.readMarkdownFile(slug);
+
+    if (databaseData?.visibility === PostVisibility.PRIVATE && !user) {
+      throw new ForbiddenException('You must be logged in to access this content.');
+    }
+
+    if (!markdownData) {
+      throw new NotFoundException(`Markdown file for slug "${slug}" not found.`);
+    }
 
     if (!databaseData || this.needsSync(databaseData, markdownData)) {
       await this.syncContentToDatabase(slug, markdownData, databaseData);
@@ -55,8 +61,8 @@ export class BlogService {
       throw new NotFoundException(`Blog post with slug "${slug}" not found.`);
     }
 
-    if (content.visibility !== requestedVisibility) {
-      throw new ForbiddenException(`You do not have access to this blog post.`);
+    if (content.visibility === PostVisibility.PRIVATE && !user) {
+      throw new ForbiddenException('You must be logged in to access this content.');
     }
 
     if (markdownData.frontMatter.tags?.includes('excalidraw')) {
