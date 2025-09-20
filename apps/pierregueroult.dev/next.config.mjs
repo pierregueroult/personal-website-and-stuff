@@ -29,6 +29,11 @@ const nextConfig = {
     ];
   },
   skipTrailingSlashRedirect: true,
+  webpack: (config) => {
+    config.externals = config.externals || [];
+    config.externals.push('require-in-the-middle');
+    return config;
+  },
 };
 
 const withNextIntl = createNextIntlPlugin();
