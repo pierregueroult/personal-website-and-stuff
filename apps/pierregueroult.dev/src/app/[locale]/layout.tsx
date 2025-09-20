@@ -4,6 +4,7 @@ import { NextIntlClientProvider, hasLocale } from 'next-intl';
 import { setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
 
+import { ConsentProvider } from '@/components/providers/consent-provider';
 import { ThemeProvider } from '@/components/providers/theme-provider';
 import { routing } from '@/i18n/routing';
 import { accentFont, mainFont } from '@/lib/fonts';
@@ -22,12 +23,14 @@ export default async function RootLayout({ children, params }: LayoutProps<'/[lo
   setRequestLocale(locale);
 
   return (
-    <html lang={locale} suppressHydrationWarning className=''>
+    <html lang={locale} suppressHydrationWarning className="">
       <body
         className={`${mainFont.variable} ${accentFont.variable} ${mainFont.className} antialiased`}
       >
         <NextIntlClientProvider>
-          <ThemeProvider>{children}</ThemeProvider>
+          <ThemeProvider>
+            <ConsentProvider>{children}</ConsentProvider>
+          </ThemeProvider>
         </NextIntlClientProvider>
       </body>
     </html>
