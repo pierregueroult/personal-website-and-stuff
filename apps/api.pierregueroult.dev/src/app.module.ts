@@ -8,10 +8,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Token } from '@repo/db/entities/auth/token';
 import { User } from '@repo/db/entities/auth/user';
 import { Category } from '@repo/db/entities/blog/category';
-import { Comment } from '@repo/db/entities/blog/comment';
 import { Post } from '@repo/db/entities/blog/post';
 import { Tag } from '@repo/db/entities/blog/tag';
 
+import { AiModule } from './ai/ai.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { AuthModule } from './auth/auth.module';
 import { JwtGuard } from './auth/guards/jwt.guard';
@@ -20,10 +20,9 @@ import { BlogModule } from './blog/blog.module';
 import { ChatModule } from './chat/chat.module';
 import { EnvironmentVariables, validateEnvironment } from './env.validation';
 import { HealthModule } from './health/health.module';
+import { LanguageModule } from './language/language.module';
 import { MailerModule } from './mailer/mailer.module';
 import { PlatformModule } from './platform/platform.module';
-import { AiModule } from './ai/ai.module';
-import { LanguageModule } from './language/language.module';
 
 @Module({
   imports: [
@@ -53,7 +52,7 @@ import { LanguageModule } from './language/language.module';
       useFactory: async (configService: ConfigService<EnvironmentVariables>) => ({
         type: 'mongodb',
         url: configService.get('NEST_DATABASE_URL'),
-        entities: [Token, User, Post, Comment, Tag, Category],
+        entities: [Token, User, Post, Tag, Category],
         logging: true,
         autoLoadEntities: true,
         synchronize: configService.get('NODE_ENV') !== 'production',

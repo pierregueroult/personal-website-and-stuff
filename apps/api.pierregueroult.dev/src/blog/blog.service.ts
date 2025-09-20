@@ -9,12 +9,13 @@ import { dirname, resolve } from 'path';
 import { Repository } from 'typeorm';
 
 import { User } from '@repo/db/entities/auth/user';
+import { Category } from '@repo/db/entities/blog/category';
 import { Post } from '@repo/db/entities/blog/post';
+import { Tag } from '@repo/db/entities/blog/tag';
 import { PostVisibility } from '@repo/db/enum/blog/status';
 import type {
   BlogResponse,
   ContentFrontMatter,
-  ContentVisibility,
   ExcalidrawJson,
   MarkdownContent,
 } from '@repo/db/types/blog/blog.interface';
@@ -144,7 +145,41 @@ export class BlogService {
       STRING_TO_VISIBILITY[markdownData.frontMatter.visibility] || PostVisibility.PRIVATE;
     post.fileHash = markdownData.fileHash;
 
-    // TODO LATER : handle categories and tags (read from markdown front matter and sync with db)
+    if (markdownData.frontMatter.categories && markdownData.frontMatter.categories.length > 0) {
+      const categories: Category[] = [];
+      for (const categoryName of markdownData.frontMatter.categories) {
+        let category = await this.postRepository.manager.findOne(Category, {
+          where: { name: categoryName },
+        });
+        if (!category) {
+          category = new Category();
+          category.name = categoryName;
+          await this.postRepository.manager.save(category);
+        }
+        categories.push(category);
+      }
+      post.categories = categories;
+    } else {
+      post.categories = [];
+    }
+
+    if (markdownData.frontMatter.tags && markdownData.frontMatter.tags.length > 0) {
+      const tags: Tag[] = [];
+      for (const tagName of markdownData.frontMatter.tags) {
+        let tag = await this.postRepository.manager.findOne(Tag, {
+          where: { name: tagName },
+        });
+        if (!tag) {
+          tag = new Tag();
+          tag.name = tagName;
+          await this.postRepository.manager.save(tag);
+        }
+        tags.push(tag);
+      }
+      post.tags = tags;
+    } else {
+      post.tags = [];
+    }
 
     await this.postRepository.save(post);
   }
@@ -152,7 +187,6 @@ export class BlogService {
   private resolveMarkdownFileDirectory(): string {
     const packageJsonPath = require.resolve('@repo/content/package.json');
     const contentPackageDir = dirname(packageJsonPath);
-
     return resolve(contentPackageDir, 'blog');
   }
 

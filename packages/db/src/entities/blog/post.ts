@@ -12,7 +12,6 @@ import {
 import { PostVisibility } from '../../enum/blog/status';
 import { User } from '../auth/user';
 import { Category } from './category';
-import { Comment } from './comment';
 import { Tag } from './tag';
 
 @Entity()
@@ -28,9 +27,6 @@ export class Post {
 
   @ManyToMany(() => Tag, (tag) => tag.posts)
   tags: Tag[];
-
-  @OneToMany(() => Comment, (comment) => comment.post)
-  comments: Comment[];
 
   @Column()
   title: string;

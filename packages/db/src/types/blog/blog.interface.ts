@@ -8,6 +8,7 @@ export interface ContentFrontMatter {
   visibility?: ContentVisibility;
   date?: string;
   tags?: string[];
+  categories?: string[];
   [key: string]: any;
 }
 
