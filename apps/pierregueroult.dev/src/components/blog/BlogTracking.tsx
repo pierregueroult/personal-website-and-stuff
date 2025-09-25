@@ -1,10 +1,11 @@
 'use client';
 
+import { InteractionAction } from '@repo/db/enum/blog/action';
+
 import { useEffect, useRef } from 'react';
 
-import { trackInteraction } from '@/lib/recommendations/api';
 import { env } from '@/lib/env/client';
-import { InteractionAction } from '@repo/db/enum/blog/action';
+import { trackInteraction } from '@/lib/recommendations/api';
 
 interface BlogTrackingProps {
   articleId: string;
@@ -18,7 +19,7 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
   // Track page view (une seule fois)
   useEffect(() => {
     if (hasTrackedView.current) return;
-    
+
     hasTrackedView.current = true;
     trackInteraction({
       articleId,
@@ -36,7 +37,7 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
       // Track significant scroll changes (every 25%)
       if (scrollPercentage >= lastScrollPosition.current + 25) {
         lastScrollPosition.current = Math.floor(scrollPercentage / 25) * 25;
-        
+
         trackInteraction({
           articleId,
           action: InteractionAction.SCROLL,
@@ -57,19 +58,22 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
   useEffect(() => {
     const handleBeforeUnload = () => {
       const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
-      
+
       // Use sendBeacon for reliable tracking on page unload
-      navigator.sendBeacon(`${env.NEXT_PUBLIC_API_URL}/blog/interactions`, JSON.stringify({
-        articleId,
-        action: InteractionAction.TIME_SPENT,
-        value: timeSpent,
-      }));
+      navigator.sendBeacon(
+        `${env.NEXT_PUBLIC_API_URL}/blog/interactions`,
+        JSON.stringify({
+          articleId,
+          action: InteractionAction.TIME_SPENT,
+          value: timeSpent,
+        }),
+      );
     };
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
         const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
-        
+
         trackInteraction({
           articleId,
           action: InteractionAction.TIME_SPENT,
@@ -80,7 +84,7 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
 
     window.addEventListener('beforeunload', handleBeforeUnload);
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    
+
     return () => {
       window.removeEventListener('beforeunload', handleBeforeUnload);
       document.removeEventListener('visibilitychange', handleVisibilityChange);

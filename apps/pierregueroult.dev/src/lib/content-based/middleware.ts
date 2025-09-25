@@ -8,8 +8,6 @@ export function createContentMiddleware() {
   return function middleware(req: NextRequest): NextResponse {
     const res = NextResponse.next();
 
-    console.log('MIDDLEWARE', req.url);
-
     const cookie = req.cookies.get(COOKIE_NAME)?.value;
     let anonId: string | null = null;
 

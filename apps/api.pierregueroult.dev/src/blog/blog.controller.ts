@@ -31,6 +31,15 @@ export class BlogController {
   }
 
   @Public()
+  @Get('trending')
+  async getTrending(@Query('max') max: number = 5, @Query('days') days: number = 7) {
+    return this.recommendationService.getTrendingRecommendations({
+      maxResults: max,
+      timeWindowDays: days,
+    });
+  }
+
+  @Public()
   @Get(':path')
   async getBlogContentBySlug(@Param('path') path: string, @CurrentUser() user: User | null) {
     const wildcard = path

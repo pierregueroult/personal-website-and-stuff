@@ -1,9 +1,10 @@
 'use client';
 
+import { InteractionAction } from '@repo/db/enum/blog/action';
+
 import { useCallback, useEffect, useRef } from 'react';
 
 import { trackInteraction } from '@/lib/recommendations/api';
-import { InteractionAction } from '@repo/db/enum/blog/action';
 
 interface UseTrackingOptions {
   articleId: string;
@@ -18,7 +19,7 @@ export function useTracking({ articleId, enabled = true }: UseTrackingOptions) {
   // Track page view (une seule fois)
   useEffect(() => {
     if (!enabled || hasTrackedView.current) return;
-    
+
     hasTrackedView.current = true;
     trackInteraction({
       articleId,
@@ -38,7 +39,7 @@ export function useTracking({ articleId, enabled = true }: UseTrackingOptions) {
       // Track significant scroll changes (every 25%)
       if (scrollPercentage >= lastScrollPosition.current + 25) {
         lastScrollPosition.current = Math.floor(scrollPercentage / 25) * 25;
-        
+
         trackInteraction({
           articleId,
           action: InteractionAction.SCROLL,
@@ -61,13 +62,16 @@ export function useTracking({ articleId, enabled = true }: UseTrackingOptions) {
 
     const handleBeforeUnload = () => {
       const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
-      
+
       // Use sendBeacon for reliable tracking on page unload
-      navigator.sendBeacon('/api/blog/interactions', JSON.stringify({
-        articleId,
-        action: InteractionAction.TIME_SPENT,
-        value: timeSpent,
-      }));
+      navigator.sendBeacon(
+        '/api/blog/interactions',
+        JSON.stringify({
+          articleId,
+          action: InteractionAction.TIME_SPENT,
+          value: timeSpent,
+        }),
+      );
     };
 
     window.addEventListener('beforeunload', handleBeforeUnload);
@@ -75,13 +79,16 @@ export function useTracking({ articleId, enabled = true }: UseTrackingOptions) {
   }, [articleId, enabled]);
 
   // Manual tracking functions
-  const trackClick = useCallback((type: string) => {
-    trackInteraction({
-      articleId,
-      action: InteractionAction.CLICK_RELATED,
-      metadata: JSON.stringify({ clickType: type }),
-    });
-  }, [articleId]);
+  const trackClick = useCallback(
+    (type: string) => {
+      trackInteraction({
+        articleId,
+        action: InteractionAction.CLICK_RELATED,
+        metadata: JSON.stringify({ clickType: type }),
+      });
+    },
+    [articleId],
+  );
 
   const trackShare = useCallback(() => {
     trackInteraction({

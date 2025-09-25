@@ -2,7 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { ObjectId } from 'mongodb';
-import { In, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { In, MongoRepository, MoreThanOrEqual, Not, Repository } from 'typeorm';
 
 import { Post } from '@repo/db/entities/blog/post';
 import { AnonymousProfile } from '@repo/db/entities/blog/profile';
@@ -10,7 +10,13 @@ import { Recommendation } from '@repo/db/entities/blog/recommendation';
 import { UserInteraction } from '@repo/db/entities/blog/user-interaction';
 
 import { EmbeddingService } from '../embedding/embedding.service';
-import { Behavior, RecommendationContext, ScoredRecommendation } from './recommendation.interface';
+import {
+  Behavior,
+  RecommendationContext,
+  ScoredRecommendation,
+  TrendingContext,
+  TrendingRecommendation,
+} from './recommendation.interface';
 
 @Injectable()
 export class RecommendationService {
@@ -18,7 +24,7 @@ export class RecommendationService {
     @InjectRepository(Post)
     private readonly postRepository: Repository<Post>,
     @InjectRepository(UserInteraction)
-    private readonly userInteractionRepository: Repository<UserInteraction>,
+    private readonly userInteractionRepository: MongoRepository<UserInteraction>,
     @InjectRepository(AnonymousProfile)
     private readonly anonymousProfileRepository: Repository<AnonymousProfile>,
     @InjectRepository(Recommendation)
@@ -364,5 +370,160 @@ export class RecommendationService {
     }));
 
     await this.recommendationRepository.save(recommendation);
+  }
+
+  async getTrendingRecommendations(context: TrendingContext): Promise<TrendingRecommendation[]> {
+    const { maxResults = 5, timeWindowDays = 7, excludeArticleIds = [] } = context;
+
+    const cutoffDate = new Date();
+    cutoffDate.setDate(cutoffDate.getDate() - timeWindowDays);
+
+    // Aggregation pipeline MongoDB pour calculer les statistiques par article
+    const pipeline = [
+      // Filtrer par date et exclure certains articles
+      {
+        $match: {
+          createdAt: { $gte: cutoffDate },
+          ...(excludeArticleIds.length > 0 && {
+            articleId: { $nin: excludeArticleIds },
+          }),
+        },
+      },
+      // Grouper par articleId et calculer les métriques
+      {
+        $group: {
+          _id: '$articleId',
+          totalInteractions: { $sum: 1 },
+          viewCount: {
+            $sum: { $cond: [{ $eq: ['$action', 'view'] }, 1, 0] },
+          },
+          totalTimeSpent: {
+            $sum: { $cond: [{ $eq: ['$action', 'time_spent'] }, { $ifNull: ['$value', 0] }, 0] },
+          },
+          shareCount: {
+            $sum: { $cond: [{ $eq: ['$action', 'share'] }, 1, 0] },
+          },
+          scrollPercentages: {
+            $push: {
+              $cond: [
+                {
+                  $and: [
+                    { $ne: ['$metadata.scrollPercentage', null] },
+                    { $ne: ['$metadata.scrollPercentage', undefined] },
+                  ],
+                },
+                '$metadata.scrollPercentage',
+                '$$REMOVE',
+              ],
+            },
+          },
+        },
+      },
+      // Calculer la moyenne du scroll et filtrer les articles avec assez d'interactions
+      {
+        $addFields: {
+          avgScrollPercentage: { $avg: '$scrollPercentages' },
+        },
+      },
+      {
+        $match: {
+          totalInteractions: { $gte: 2 }, // Au moins 2 interactions
+        },
+      },
+      // Trier par nombre total d'interactions (pré-tri)
+      {
+        $sort: { totalInteractions: -1 },
+      },
+      // Limiter pour éviter de traiter trop de données
+      {
+        $limit: maxResults * 3,
+      },
+    ];
+
+    const trendingAggregation = await this.userInteractionRepository.aggregate(pipeline).toArray();
+
+    // Calcul du score de trending pour chaque article
+    const scoredArticles = trendingAggregation.map((data: any) => {
+      const daysSinceCreation = timeWindowDays; // Approximation pour le decay
+
+      // Poids des métriques
+      const viewScore = Number(data.viewCount || 0) * 1.0;
+      const timeScore = (Number(data.totalTimeSpent || 0) / 1000 / 60) * 2.0; // Minutes * 2
+      const shareScore = Number(data.shareCount || 0) * 3.0;
+      const scrollScore = (Number(data.avgScrollPercentage || 0) > 70 ? 1 : 0) * 1.5;
+
+      // Decay factor basé sur la fraîcheur (plus récent = meilleur)
+      const decayFactor = Math.exp(-daysSinceCreation * 0.1);
+
+      const trendingScore = (viewScore + timeScore + shareScore + scrollScore) * decayFactor;
+
+      return {
+        articleId: data._id,
+        trendingScore,
+        viewCount: Number(data.viewCount || 0),
+        totalTimeSpent: Number(data.totalTimeSpent || 0),
+        shareCount: Number(data.shareCount || 0),
+        avgScrollPercentage: Number(data.avgScrollPercentage || 0),
+      };
+    });
+
+    // Tri par score décroissant
+    scoredArticles.sort((a, b) => b.trendingScore - a.trendingScore);
+
+    // Limitation des résultats
+    const topArticles = scoredArticles.slice(0, maxResults);
+
+    // Récupération des données des articles
+    const articleIds = topArticles.map((a) => a.articleId);
+    const articles = await this.postRepository.find({
+      where: { _id: In(articleIds.map((id) => new ObjectId(String(id)))) },
+      select: ['_id', 'title', 'slug', 'tags'],
+    });
+
+    // Construction des recommandations finales
+    const recommendations: TrendingRecommendation[] = topArticles
+      .map((scored) => {
+        const article = articles.find((a) => a._id.toString() === scored.articleId);
+        if (!article) return null;
+
+        const reasons = [];
+        if (scored.viewCount > 5) reasons.push(`${scored.viewCount} vues récentes`);
+        if (scored.shareCount > 0) reasons.push(`${scored.shareCount} partage(s)`);
+        if (scored.avgScrollPercentage > 70) reasons.push('Lecture approfondie');
+        if (scored.totalTimeSpent > 300000) reasons.push('Temps de lecture élevé'); // > 5 min
+
+        const engagement = this.calculateEngagementRate(scored);
+
+        return {
+          articleId: scored.articleId,
+          title: article.title,
+          slug: article.slug,
+          tags: Array.isArray(article.tags) ? article.tags.map((tag) => String(tag)) : [],
+          trendingScore: Math.round(scored.trendingScore * 100) / 100,
+          viewCount: scored.viewCount,
+          engagement,
+          reasons,
+        };
+      })
+      .filter(Boolean) as TrendingRecommendation[];
+
+    this.log.debug(
+      `Generated ${recommendations.length} trending recommendations for ${timeWindowDays} days window`,
+    );
+
+    return recommendations;
+  }
+
+  private calculateEngagementRate(data: any): number {
+    // Calcul d'un taux d'engagement basé sur le temps passé vs vues
+    if (data.viewCount === 0) return 0;
+
+    const avgTimePerView = data.totalTimeSpent / data.viewCount / 1000; // secondes
+    const scrollBonus = data.avgScrollPercentage > 70 ? 1.2 : 1.0;
+    const shareBonus = data.shareCount > 0 ? 1.5 : 1.0;
+
+    const engagementRate = (avgTimePerView / 60) * scrollBonus * shareBonus; // Minutes d'engagement
+
+    return Math.min(Math.round(engagementRate * 10) / 10, 10); // Max 10, 1 décimale
   }
 }

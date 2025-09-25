@@ -47,9 +47,7 @@ export default function Home() {
           </ul>
         </div>
       </section>
-      <section className="py-16">
-        {/* <ProjectSlider /> */}
-      </section>
+      <section className="py-16">{/* <ProjectSlider /> */}</section>
     </Fragment>
   );
 }

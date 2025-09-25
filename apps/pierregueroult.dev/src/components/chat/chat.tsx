@@ -13,7 +13,7 @@ export default function Chat() {
     <AnimatePresence>
       {isOpen && (
         <motion.aside
-          className="sticky top-0 h-screen overflow-hidden "
+          className="sticky top-0 h-screen overflow-hidden"
           initial={{ width: 0 }}
           animate={{ width: 300 }}
           exit={{ width: 0, transition: { delay: 0.2, duration: 0.2 } }}
@@ -27,11 +27,11 @@ export default function Chat() {
             style={{ height: '100%' }}
             className="flex h-full w-full flex-col"
           >
-            <div className='w-full flex-1'></div>
-            <div className='p-2'>
+            <div className="w-full flex-1"></div>
+            <div className="p-2">
               <Textarea
                 placeholder="Ask anything"
-                className=" text-foreground placeholder-muted-foreground max-h-[25vh] min-h-10 w-full resize-none border-0 border-none p-0 text-sm shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                className="text-foreground placeholder-muted-foreground max-h-[25vh] min-h-10 w-full resize-none border-0 border-none p-0 text-sm shadow-none outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
                 rows={1}
                 onInput={(e) => {
                   const target = e.target as HTMLTextAreaElement;

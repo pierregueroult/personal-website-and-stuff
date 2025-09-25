@@ -1,6 +1,11 @@
 import { Suspense } from 'react';
+
+import {
+  type RecommendationItem,
+  getPersonalizedRecommendationsSSR,
+} from '@/lib/recommendations/ssr';
+
 import { Recommendations } from './RecommendationsLogic';
-import { getPersonalizedRecommendationsSSR, type RecommendationItem } from '@/lib/recommendations/ssr';
 
 interface PersonalizedRecommendationsSectionProps {
   articleId: string;
@@ -14,15 +19,15 @@ interface PersonalizedRecommendationsSectionProps {
   }) => React.ReactNode;
 }
 
-async function PersonalizedRecommendationsContent({ 
-  articleId, 
-  maxResults, 
-  children 
+async function PersonalizedRecommendationsContent({
+  articleId,
+  maxResults,
+  children,
 }: Omit<PersonalizedRecommendationsSectionProps, 'fallback'>) {
   const recommendations = await getPersonalizedRecommendationsSSR(articleId, maxResults);
-  
+
   return (
-    <Recommendations 
+    <Recommendations
       recommendations={recommendations}
       currentArticleId={articleId}
       maxResults={maxResults}
@@ -32,18 +37,15 @@ async function PersonalizedRecommendationsContent({
   );
 }
 
-export function PersonalizedRecommendationsSection({ 
-  articleId, 
-  maxResults = 5, 
+export function PersonalizedRecommendationsSection({
+  articleId,
+  maxResults = 5,
   fallback = <div>Chargement des recommandations personnalisées...</div>,
-  children 
+  children,
 }: PersonalizedRecommendationsSectionProps) {
   return (
     <Suspense fallback={fallback}>
-      <PersonalizedRecommendationsContent 
-        articleId={articleId}
-        maxResults={maxResults}
-      >
+      <PersonalizedRecommendationsContent articleId={articleId} maxResults={maxResults}>
         {children}
       </PersonalizedRecommendationsContent>
     </Suspense>

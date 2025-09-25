@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
+
+import { type RecommendationItem, getTrendingRecommendationsSSR } from '@/lib/recommendations/ssr';
+
 import { Recommendations } from './RecommendationsLogic';
-import { getTrendingRecommendationsSSR, type RecommendationItem } from '@/lib/recommendations/ssr';
 
 interface TrendingRecommendationsSectionProps {
   articleId: string;
@@ -14,15 +16,15 @@ interface TrendingRecommendationsSectionProps {
   }) => React.ReactNode;
 }
 
-async function TrendingRecommendationsContent({ 
-  articleId, 
-  maxResults, 
-  children 
+async function TrendingRecommendationsContent({
+  articleId,
+  maxResults,
+  children,
 }: Omit<TrendingRecommendationsSectionProps, 'fallback'>) {
   const recommendations = await getTrendingRecommendationsSSR(articleId, maxResults);
-  
+
   return (
-    <Recommendations 
+    <Recommendations
       recommendations={recommendations}
       currentArticleId={articleId}
       maxResults={maxResults}
@@ -32,18 +34,15 @@ async function TrendingRecommendationsContent({
   );
 }
 
-export function TrendingRecommendationsSection({ 
-  articleId, 
-  maxResults = 5, 
+export function TrendingRecommendationsSection({
+  articleId,
+  maxResults = 5,
   fallback = <div>Chargement des articles populaires...</div>,
-  children 
+  children,
 }: TrendingRecommendationsSectionProps) {
   return (
     <Suspense fallback={fallback}>
-      <TrendingRecommendationsContent 
-        articleId={articleId}
-        maxResults={maxResults}
-      >
+      <TrendingRecommendationsContent articleId={articleId} maxResults={maxResults}>
         {children}
       </TrendingRecommendationsContent>
     </Suspense>

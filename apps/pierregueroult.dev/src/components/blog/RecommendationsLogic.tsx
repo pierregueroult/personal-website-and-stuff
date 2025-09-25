@@ -1,5 +1,6 @@
-import { trackInteraction } from '@/lib/recommendations/api';
 import { InteractionAction } from '@repo/db/enum/blog/action';
+
+import { trackInteraction } from '@/lib/recommendations/api';
 import type { RecommendationItem } from '@/lib/recommendations/ssr';
 
 interface RecommendationsProps {
@@ -14,13 +15,12 @@ interface RecommendationsProps {
   }) => React.ReactNode;
 }
 
-export function Recommendations({ 
-  recommendations, 
-  currentArticleId, 
+export function Recommendations({
+  recommendations,
+  currentArticleId,
   maxResults = 5,
-  children 
+  children,
 }: RecommendationsProps) {
-  
   const trackRecommendationClick = async (recommendedArticleId: string) => {
     try {
       await trackInteraction({
@@ -28,7 +28,7 @@ export function Recommendations({
         action: InteractionAction.CLICK_RELATED,
         metadata: JSON.stringify({
           recommendedArticleId,
-          clickType: 'recommendation_click'
+          clickType: 'recommendation_click',
         }),
       });
     } catch (error) {
@@ -37,7 +37,7 @@ export function Recommendations({
   };
 
   const limitedRecommendations = recommendations.slice(0, maxResults);
-  
+
   return (
     <>
       {children({

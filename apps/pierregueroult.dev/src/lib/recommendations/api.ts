@@ -1,4 +1,5 @@
 import { InteractionAction } from '@repo/db/enum/blog/action';
+
 import { env } from '@/lib/env/client';
 
 export interface TrackInteractionPayload {
@@ -20,6 +21,17 @@ export interface RecommendationResponse {
   similarity?: number;
 }
 
+export interface TrendingResponse {
+  articleId: string;
+  title: string;
+  slug: string;
+  tags: string[];
+  trendingScore: number;
+  viewCount: number;
+  engagement: number;
+  reasons: string[];
+}
+
 // Track user interaction
 export async function trackInteraction(payload: TrackInteractionPayload): Promise<void> {
   try {
@@ -38,24 +50,48 @@ export async function trackInteraction(payload: TrackInteractionPayload): Promis
 
 // Get recommendations for an article
 export async function getRecommendations(
-  articleId: string, 
-  maxResults = 5
+  articleId: string,
+  maxResults = 5,
 ): Promise<RecommendationResponse[]> {
   try {
     const response = await fetch(
       `${env.NEXT_PUBLIC_API_URL}/blog/recommendations/${articleId}?max=${maxResults}`,
       {
         credentials: 'include', // Important pour les cookies
-      }
+      },
     );
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Failed to fetch recommendations:', error);
+    return [];
+  }
+}
+
+// Get trending articles
+export async function getTrending(max: number = 5, days: number = 7): Promise<TrendingResponse[]> {
+  try {
+    const response = await fetch(
+      `${env.NEXT_PUBLIC_API_URL}/blog/trending?max=${max}&days=${days}`,
+      {
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    );
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to fetch trending:', error);
     return [];
   }
 }
@@ -66,11 +102,11 @@ export async function getProfileDebug() {
     const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/blog/profile/debug`, {
       credentials: 'include',
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error('Failed to fetch profile debug:', error);

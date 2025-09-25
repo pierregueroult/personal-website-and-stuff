@@ -54,15 +54,7 @@ import { PlatformModule } from './platform/platform.module';
       useFactory: async (configService: ConfigService<EnvironmentVariables>) => ({
         type: 'mongodb',
         url: configService.get('NEST_DATABASE_URL'),
-        entities: [
-          Token,
-          User,
-          Post,
-          Tag,
-          AnonymousProfile,
-          UserInteraction,
-          Recommendation,
-        ],
+        entities: [Token, User, Post, Tag, AnonymousProfile, UserInteraction, Recommendation],
         logging: true,
         autoLoadEntities: true,
         synchronize: configService.get('NODE_ENV') !== 'production',

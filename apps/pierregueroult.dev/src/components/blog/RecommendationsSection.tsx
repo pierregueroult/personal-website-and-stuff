@@ -1,6 +1,8 @@
 import { Suspense } from 'react';
+
+import { type RecommendationItem, getRecommendationsSSR } from '@/lib/recommendations/ssr';
+
 import { Recommendations } from './RecommendationsLogic';
-import { getRecommendationsSSR, type RecommendationItem } from '@/lib/recommendations/ssr';
 
 interface RecommendationsSectionProps {
   articleId: string;
@@ -14,15 +16,15 @@ interface RecommendationsSectionProps {
   }) => React.ReactNode;
 }
 
-async function RecommendationsContent({ 
-  articleId, 
-  maxResults, 
-  children 
+async function RecommendationsContent({
+  articleId,
+  maxResults,
+  children,
 }: Omit<RecommendationsSectionProps, 'fallback'>) {
   const recommendations = await getRecommendationsSSR(articleId, maxResults);
-  
+
   return (
-    <Recommendations 
+    <Recommendations
       recommendations={recommendations}
       currentArticleId={articleId}
       maxResults={maxResults}
@@ -32,18 +34,15 @@ async function RecommendationsContent({
   );
 }
 
-export function RecommendationsSection({ 
-  articleId, 
-  maxResults = 5, 
+export function RecommendationsSection({
+  articleId,
+  maxResults = 5,
   fallback = <div>Chargement des recommandations...</div>,
-  children 
+  children,
 }: RecommendationsSectionProps) {
   return (
     <Suspense fallback={fallback}>
-      <RecommendationsContent 
-        articleId={articleId}
-        maxResults={maxResults}
-      >
+      <RecommendationsContent articleId={articleId} maxResults={maxResults}>
         {children}
       </RecommendationsContent>
     </Suspense>

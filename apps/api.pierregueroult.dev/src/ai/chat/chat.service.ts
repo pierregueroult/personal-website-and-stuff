@@ -1,10 +1,11 @@
 import { Injectable } from '@nestjs/common';
 
 import { UIMessage, convertToModelMessages, stepCountIs, streamText } from 'ai';
-import { LanguageService } from '../../language/language.service';
 
 import { type MistralLanguageModelOptions, mistral } from '@ai-sdk/mistral';
 import { type Locale } from '@repo/i18n/locales';
+
+import { LanguageService } from '../../language/language.service';
 
 @Injectable()
 export class ChatService {

@@ -1,13 +1,7 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  ObjectIdColumn,
-  UpdateDateColumn,
-} from 'typeorm';
+import { ObjectId } from 'mongodb';
+import { Column, CreateDateColumn, Entity, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
 
 import { Role } from '../../enum/auth/role';
-import { ObjectId } from 'mongodb';
 
 @Entity()
 export class User {

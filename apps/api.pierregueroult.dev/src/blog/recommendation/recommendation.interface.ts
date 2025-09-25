@@ -6,6 +6,12 @@ export interface RecommendationContext {
   maxResults?: number;
 }
 
+export interface TrendingContext {
+  maxResults?: number;
+  timeWindowDays?: number;
+  excludeArticleIds?: string[];
+}
+
 export interface ScoredRecommendation {
   articleId: string;
   title: string;
@@ -16,6 +22,17 @@ export interface ScoredRecommendation {
   behavioralScore: number;
   reasons: string[];
   similarity?: number;
+}
+
+export interface TrendingRecommendation {
+  articleId: string;
+  title: string;
+  slug: string;
+  tags: string[];
+  trendingScore: number;
+  viewCount: number;
+  engagement: number;
+  reasons: string[];
 }
 
 export interface Behavior {
