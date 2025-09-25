@@ -1,29 +1,20 @@
+import { ObjectId } from 'mongodb';
 import {
   Column,
   CreateDateColumn,
   Entity,
   ManyToMany,
-  ManyToOne,
   ObjectIdColumn,
-  OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { PostVisibility } from '../../enum/blog/status';
-import { User } from '../auth/user';
-import { Category } from './category';
 import { Tag } from './tag';
 
 @Entity()
 export class Post {
   @ObjectIdColumn()
-  _id: string;
-
-  @ManyToOne(() => User, (user) => user.posts)
-  user: User;
-
-  @ManyToMany(() => Category, (category) => category.posts)
-  categories: Category[];
+  _id: ObjectId;
 
   @ManyToMany(() => Tag, (tag) => tag.posts)
   tags: Tag[];
@@ -45,4 +36,22 @@ export class Post {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column({ nullable: true })
+  embedding: number[];
+
+  @Column({ type: 'text' })
+  content: string;
+
+  @Column({ default: 0 })
+  viewCount: number;
+
+  @Column({ default: 0 })
+  engagementScore: number;
+
+  @Column({ default: 0 })
+  averageReadingTime: number;
+
+  @Column({ nullable: true })
+  embeddingUpdatedAt: Date;
 }

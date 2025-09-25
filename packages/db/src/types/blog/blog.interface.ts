@@ -9,6 +9,7 @@ export interface ContentFrontMatter {
   date?: string;
   tags?: string[];
   categories?: string[];
+  ['kanban-plugin']?: 'board' | 'task' | string;
   [key: string]: any;
 }
 
@@ -18,7 +19,6 @@ export interface ContentResponseBase {
   database: {
     id: string;
     visibility: PostVisibility;
-    // TODO LATER : handle the comments, tags, categories
   };
 }
 
@@ -30,7 +30,17 @@ export interface DrawingResponse extends ContentResponseBase {
   drawing: ExcalidrawJson;
 }
 
-export type BlogResponse = ContentResponse | DrawingResponse;
+export interface KanbanResponse extends ContentResponseBase {
+  kanban: {
+    title: string;
+    tasks: {
+      text: string;
+      isDone: boolean;
+    }[];
+  }[];
+}
+
+export type BlogResponse = ContentResponse | DrawingResponse | KanbanResponse;
 
 export type ContentVisibility = 'public' | 'private' | 'unlisted';
 

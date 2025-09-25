@@ -1,13 +1,19 @@
-import { Column, CreateDateColumn, Entity, ManyToMany, ObjectIdColumn, UpdateDateColumn } from "typeorm";
-import { Post } from "./post";
+import { ObjectId } from 'mongodb';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToMany,
+  ObjectIdColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+import { Post } from './post';
 
 @Entity()
 export class Tag {
   @ObjectIdColumn()
-  _id: string;
-
-  @Column()
-  name: string;
+  _id: ObjectId;
 
   @Column({ unique: true })
   slug: string;

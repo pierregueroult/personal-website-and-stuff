@@ -1,9 +1,32 @@
 import createMiddleware from 'next-intl/middleware';
+import { type NextMiddleware, type NextRequest, NextResponse } from 'next/server';
 
 import { routing } from '@/i18n/routing';
+import { createContentMiddleware } from '@/lib/content-based/middleware';
 
-export default createMiddleware(routing);
+export type MiddlewareFactory = (middleware: NextMiddleware) => NextMiddleware;
+
+const composeMiddlewares = (middlewares: {
+  [key: string]: (req: NextRequest) => NextResponse | Promise<NextResponse>;
+}) => {
+  return (req: NextRequest) => {
+    const parsedMiddlewares = Object.entries(middlewares);
+    const initialResponse = Promise.resolve(NextResponse.next());
+
+    return parsedMiddlewares.reduce((prevPromise, [, middleware]) => {
+      return prevPromise.then((res) => {
+        return res?.status >= 300 && res?.status < 400 ? res : middleware(req);
+      });
+    }, initialResponse);
+  };
+};
+
+export const middleware = composeMiddlewares({
+  i18nMiddleware: createMiddleware(routing),
+  contentMiddleware: createContentMiddleware(),
+});
 
 export const config = {
   matcher: '/((?!api|trpc|_next|_vercel|.*\\..*).*)',
+  runtime: 'nodejs',
 };

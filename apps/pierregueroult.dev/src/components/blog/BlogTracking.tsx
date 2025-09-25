@@ -1,0 +1,92 @@
+'use client';
+
+import { useEffect, useRef } from 'react';
+
+import { trackInteraction } from '@/lib/recommendations/api';
+import { env } from '@/lib/env/client';
+import { InteractionAction } from '@repo/db/enum/blog/action';
+
+interface BlogTrackingProps {
+  articleId: string;
+}
+
+export function BlogTracking({ articleId }: BlogTrackingProps) {
+  const startTime = useRef<number>(Date.now());
+  const lastScrollPosition = useRef<number>(0);
+  const hasTrackedView = useRef<boolean>(false);
+
+  // Track page view (une seule fois)
+  useEffect(() => {
+    if (hasTrackedView.current) return;
+    
+    hasTrackedView.current = true;
+    trackInteraction({
+      articleId,
+      action: InteractionAction.VIEW,
+    });
+  }, [articleId]);
+
+  // Track scroll behavior
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const scrollPosition = window.scrollY;
+      const scrollPercentage = Math.round((scrollPosition / scrollHeight) * 100);
+
+      // Track significant scroll changes (every 25%)
+      if (scrollPercentage >= lastScrollPosition.current + 25) {
+        lastScrollPosition.current = Math.floor(scrollPercentage / 25) * 25;
+        
+        trackInteraction({
+          articleId,
+          action: InteractionAction.SCROLL,
+          value: scrollPercentage,
+          metadata: JSON.stringify({
+            scrollPercentage,
+            timeOnPage: Date.now() - startTime.current,
+          }),
+        });
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [articleId]);
+
+  // Track time spent when leaving page
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
+      
+      // Use sendBeacon for reliable tracking on page unload
+      navigator.sendBeacon(`${env.NEXT_PUBLIC_API_URL}/blog/interactions`, JSON.stringify({
+        articleId,
+        action: InteractionAction.TIME_SPENT,
+        value: timeSpent,
+      }));
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
+        
+        trackInteraction({
+          articleId,
+          action: InteractionAction.TIME_SPENT,
+          value: timeSpent,
+        });
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [articleId]);
+
+  // Composant invisible - juste pour le tracking
+  return null;
+}

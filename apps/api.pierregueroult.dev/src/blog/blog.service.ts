@@ -9,9 +9,7 @@ import { dirname, resolve } from 'path';
 import { Repository } from 'typeorm';
 
 import { User } from '@repo/db/entities/auth/user';
-import { Category } from '@repo/db/entities/blog/category';
 import { Post } from '@repo/db/entities/blog/post';
-import { Tag } from '@repo/db/entities/blog/tag';
 import { PostVisibility } from '@repo/db/enum/blog/status';
 import type {
   BlogResponse,
@@ -19,6 +17,8 @@ import type {
   ExcalidrawJson,
   MarkdownContent,
 } from '@repo/db/types/blog/blog.interface';
+
+import { EmbeddingService } from './embedding/embedding.service';
 
 const STRING_TO_VISIBILITY: Record<string, PostVisibility> = {
   public: PostVisibility.PUBLIC,
@@ -29,74 +29,48 @@ const STRING_TO_VISIBILITY: Record<string, PostVisibility> = {
 @Injectable()
 export class BlogService {
   constructor(
-    @InjectRepository(Post)
-    private readonly postRepository: Repository<Post>,
+    @InjectRepository(Post) private readonly postRepository: Repository<Post>,
+    private readonly embeddingService: EmbeddingService,
   ) {}
 
   async getBlogContentBySlug(slug: string, user: User | null): Promise<BlogResponse> {
     const databaseData = await this.postRepository.findOne({
       where: { slug },
-      relations: ['comments', 'categories', 'tags'],
+      select: ['_id', 'fileHash'],
     });
 
     const markdownData = await this.readMarkdownFile(slug);
-
-    if (databaseData?.visibility === PostVisibility.PRIVATE && !user) {
-      throw new ForbiddenException('You must be logged in to access this content.');
-    }
-
-    if (!markdownData) {
-      throw new NotFoundException(`Markdown file for slug "${slug}" not found.`);
-    }
 
     if (!databaseData || this.needsSync(databaseData, markdownData)) {
       await this.syncContentToDatabase(slug, markdownData, databaseData);
     }
 
+    this.validateAccessPermissions(databaseData, user);
+
+    if (!markdownData) {
+      throw new NotFoundException(`Markdown file for slug "${slug}" not found.`);
+    }
+
     const content = await this.postRepository.findOne({
       where: { slug },
-      relations: ['comments', 'categories', 'tags'],
+      relations: ['tags'],
     });
 
     if (!content) {
       throw new NotFoundException(`Blog post with slug "${slug}" not found.`);
     }
 
-    if (content.visibility === PostVisibility.PRIVATE && !user) {
-      throw new ForbiddenException('You must be logged in to access this content.');
-    }
+    this.validateAccessPermissions(content, user);
 
     if (markdownData.frontMatter.tags?.includes('excalidraw')) {
-      try {
-        const compressedJsonDrawing = markdownData.content
-          .split('```compressed-json')[1]
-          .split('```')[0];
-
-        const result = this.decompressDrawing(compressedJsonDrawing);
-
-        return {
-          slug: content.slug,
-          frontMatter: markdownData.frontMatter,
-          drawing: result,
-          database: {
-            id: content._id,
-            ...content,
-          },
-        };
-      } catch (error) {
-        throw new Error(`Error parsing excalidraw drawing in markdown: ${error}`);
-      }
+      return this.buildExcalidrawResponse(content, markdownData);
     }
 
-    return {
-      slug: content.slug,
-      frontMatter: markdownData.frontMatter,
-      content: markdownData.content,
-      database: {
-        id: content._id,
-        ...content,
-      },
-    };
+    return this.buildStandardResponse(content, markdownData);
+  }
+
+  async getAllPosts(): Promise<Post[]> {
+    return this.postRepository.find();
   }
 
   async readMarkdownFile(slug: string): Promise<MarkdownContent> {
@@ -127,6 +101,12 @@ export class BlogService {
     }
   }
 
+  private resolveMarkdownFileDirectory(): string {
+    const packageJsonPath = require.resolve('@repo/content/package.json');
+    const contentPackageDir = dirname(packageJsonPath);
+    return resolve(contentPackageDir, 'blog');
+  }
+
   private needsSync(databaseData: Post, markdownData: MarkdownContent): boolean {
     if (!databaseData) return true;
     return databaseData.fileHash !== markdownData.fileHash;
@@ -136,58 +116,19 @@ export class BlogService {
     slug: string,
     markdownData: MarkdownContent,
     existingData?: Post,
-  ) {
+  ): Promise<void> {
     const post = existingData || new Post();
 
     post.slug = slug;
-    post.title = markdownData.frontMatter.title || 'slug';
+    post.title = markdownData.frontMatter.title || slug;
     post.visibility =
       STRING_TO_VISIBILITY[markdownData.frontMatter.visibility] || PostVisibility.PRIVATE;
     post.fileHash = markdownData.fileHash;
-
-    if (markdownData.frontMatter.categories && markdownData.frontMatter.categories.length > 0) {
-      const categories: Category[] = [];
-      for (const categoryName of markdownData.frontMatter.categories) {
-        let category = await this.postRepository.manager.findOne(Category, {
-          where: { name: categoryName },
-        });
-        if (!category) {
-          category = new Category();
-          category.name = categoryName;
-          await this.postRepository.manager.save(category);
-        }
-        categories.push(category);
-      }
-      post.categories = categories;
-    } else {
-      post.categories = [];
-    }
-
-    if (markdownData.frontMatter.tags && markdownData.frontMatter.tags.length > 0) {
-      const tags: Tag[] = [];
-      for (const tagName of markdownData.frontMatter.tags) {
-        let tag = await this.postRepository.manager.findOne(Tag, {
-          where: { name: tagName },
-        });
-        if (!tag) {
-          tag = new Tag();
-          tag.name = tagName;
-          await this.postRepository.manager.save(tag);
-        }
-        tags.push(tag);
-      }
-      post.tags = tags;
-    } else {
-      post.tags = [];
-    }
+    post.content = markdownData.content;
+    const embedding = await this.embeddingService.generateEmbedding(markdownData.content);
+    post.embedding = embedding;
 
     await this.postRepository.save(post);
-  }
-
-  private resolveMarkdownFileDirectory(): string {
-    const packageJsonPath = require.resolve('@repo/content/package.json');
-    const contentPackageDir = dirname(packageJsonPath);
-    return resolve(contentPackageDir, 'blog');
   }
 
   private decompressDrawing(compressedData: string): ExcalidrawJson {
@@ -199,14 +140,57 @@ export class BlogService {
         cleanedData += char;
       }
     }
+
     const resultAsString = decompressFromBase64(cleanedData);
-    if (!resultAsString) throw new Error('The drawing data is corrupted or invalid.');
+    if (!resultAsString) {
+      throw new Error('The drawing data is corrupted or invalid.');
+    }
 
     try {
       const result = JSON.parse(resultAsString);
       return result;
     } catch {
       throw new Error('The drawing data is corrupted or invalid.');
+    }
+  }
+
+  private buildExcalidrawResponse(content: Post, markdownData: MarkdownContent): BlogResponse {
+    try {
+      const compressedJsonDrawing = markdownData.content
+        .split('```compressed-json')[1]
+        .split('```')[0];
+
+      const result = this.decompressDrawing(compressedJsonDrawing);
+
+      return {
+        slug: content.slug,
+        frontMatter: markdownData.frontMatter,
+        drawing: result,
+        database: {
+          id: content._id.toHexString(),
+          ...content,
+        },
+      };
+    } catch (error) {
+      throw new Error(`Error parsing excalidraw drawing in markdown: ${error}`);
+    }
+  }
+
+  private buildStandardResponse(content: Post, markdownData: MarkdownContent): BlogResponse {
+    return {
+      slug: content.slug,
+      frontMatter: markdownData.frontMatter,
+      content: markdownData.content,
+      database: {
+        id: content._id.toHexString(),
+        ...content,
+      },
+    };
+  }
+
+  private validateAccessPermissions(content: Post | null, user: User | null): void {
+    if (content?.visibility === PostVisibility.PRIVATE && !user) {
+      throw new ForbiddenException('You must be logged in to access this content.');
     }
   }
 }

@@ -1,9 +1,10 @@
+import { ObjectId } from 'mongodb';
 import { Column, CreateDateColumn, Entity, ObjectIdColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity()
 export class Token {
   @ObjectIdColumn()
-  _id: string;
+  _id: ObjectId;
 
   @Column({ unique: true })
   name: string;

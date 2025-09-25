@@ -3,17 +3,16 @@ import {
   CreateDateColumn,
   Entity,
   ObjectIdColumn,
-  OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
 
 import { Role } from '../../enum/auth/role';
-import { Post } from '../blog/post';
+import { ObjectId } from 'mongodb';
 
 @Entity()
 export class User {
   @ObjectIdColumn()
-  _id: string;
+  _id: ObjectId;
 
   @Column({ unique: true })
   email: string;
@@ -29,9 +28,6 @@ export class User {
 
   @Column({ type: 'enum', enum: Role, default: Role.USER })
   role: Role;
-
-  @OneToMany(() => Post, (post) => post.user)
-  posts: Post[];
 
   @CreateDateColumn()
   created_at: Date;

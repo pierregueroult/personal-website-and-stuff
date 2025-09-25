@@ -178,7 +178,6 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
     if (!line.length) return;
 
     this.lastMessageTime = Date.now();
-    this.logger.debug(`Received: ${line}`);
 
     if (this.isPingMessage(line)) {
       this.handlePingMessage(line);
@@ -199,8 +198,6 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
       this.handleNoticeMessage(line);
       return;
     }
-
-    this.logger.debug(`Unhandled message type: ${line}`);
   }
 
   private isPingMessage(line: string): boolean {
@@ -226,7 +223,7 @@ export class TwitchChatService implements OnModuleInit, OnModuleDestroy {
 
   private handlePongMessage(): void {
     if (this.pendingPing) {
-      this.logger.debug('Received PONG response - connection is healthy');
+      this.logger.log('Received PONG response - connection is healthy');
       this.pendingPing = false;
       if (this.pingTimeout) {
         clearTimeout(this.pingTimeout);

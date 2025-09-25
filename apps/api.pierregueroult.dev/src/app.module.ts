@@ -7,9 +7,11 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { Token } from '@repo/db/entities/auth/token';
 import { User } from '@repo/db/entities/auth/user';
-import { Category } from '@repo/db/entities/blog/category';
 import { Post } from '@repo/db/entities/blog/post';
+import { AnonymousProfile } from '@repo/db/entities/blog/profile';
+import { Recommendation } from '@repo/db/entities/blog/recommendation';
 import { Tag } from '@repo/db/entities/blog/tag';
+import { UserInteraction } from '@repo/db/entities/blog/user-interaction';
 
 import { AiModule } from './ai/ai.module';
 import { AnalyticsModule } from './analytics/analytics.module';
@@ -52,7 +54,15 @@ import { PlatformModule } from './platform/platform.module';
       useFactory: async (configService: ConfigService<EnvironmentVariables>) => ({
         type: 'mongodb',
         url: configService.get('NEST_DATABASE_URL'),
-        entities: [Token, User, Post, Tag, Category],
+        entities: [
+          Token,
+          User,
+          Post,
+          Tag,
+          AnonymousProfile,
+          UserInteraction,
+          Recommendation,
+        ],
         logging: true,
         autoLoadEntities: true,
         synchronize: configService.get('NODE_ENV') !== 'production',
