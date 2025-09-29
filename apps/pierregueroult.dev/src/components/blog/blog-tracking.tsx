@@ -16,7 +16,6 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
   const lastScrollPosition = useRef<number>(0);
   const hasTrackedView = useRef<boolean>(false);
 
-  // Track page view (une seule fois)
   useEffect(() => {
     if (hasTrackedView.current) return;
 
@@ -27,14 +26,12 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
     });
   }, [articleId]);
 
-  // Track scroll behavior
   useEffect(() => {
     const handleScroll = () => {
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPosition = window.scrollY;
       const scrollPercentage = Math.round((scrollPosition / scrollHeight) * 100);
 
-      // Track significant scroll changes (every 25%)
       if (scrollPercentage >= lastScrollPosition.current + 25) {
         lastScrollPosition.current = Math.floor(scrollPercentage / 25) * 25;
 
@@ -54,12 +51,10 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [articleId]);
 
-  // Track time spent when leaving page
   useEffect(() => {
     const handleBeforeUnload = () => {
       const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
 
-      // Use sendBeacon for reliable tracking on page unload
       navigator.sendBeacon(
         `${env.NEXT_PUBLIC_API_URL}/blog/interactions`,
         JSON.stringify({
@@ -91,6 +86,5 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
     };
   }, [articleId]);
 
-  // Composant invisible - juste pour le tracking
   return null;
 }
