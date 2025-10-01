@@ -31,7 +31,7 @@ export class BlogService {
   constructor(
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     private readonly embeddingService: EmbeddingService,
-  ) { }
+  ) {}
 
   async getBlogContentBySlug(slug: string, user: User | null): Promise<BlogResponse> {
     const databaseData = await this.postRepository.findOne({

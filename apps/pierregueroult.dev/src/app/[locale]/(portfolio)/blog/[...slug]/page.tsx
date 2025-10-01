@@ -45,7 +45,7 @@ export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[.
   if ('drawing' in data) {
     const files: BinaryFiles = parseDrawingFiles(data.markdown, locale);
 
-    data.drawing.files = files; 
+    data.drawing.files = files;
 
     return (
       <>
