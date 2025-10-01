@@ -204,6 +204,9 @@ importers:
       '@excalidraw/excalidraw':
         specifier: ^0.18.0
         version: 0.18.0(@types/react-dom@19.1.7(@types/react@19.1.11))(@types/react@19.1.11)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+      '@flowershow/remark-wiki-link':
+        specifier: ^2.0.4
+        version: 2.0.4
       '@mdx-js/loader':
         specifier: ^3.1.1
         version: 3.1.1(webpack@5.99.6(@swc/core@1.13.2))
@@ -1030,6 +1033,9 @@ packages:
 
   '@floating-ui/utils@0.2.10':
     resolution: {integrity: sha512-aGTxbpbg8/b5JfU1HXSrbH3wXZuLPJcNEcZQFMxLs3oSzgtVu6nFPkbbGGUvBcUjKV2YyB9Wxxabo+HEH9tcRQ==}
+
+  '@flowershow/remark-wiki-link@2.0.4':
+    resolution: {integrity: sha512-GGDhE/LUsDJ/Otp0Q8KXJI7MlSYdByLZtB0EutSVuQlXvghxfcBcwYx+7J5qwOUeozEGT3N3nYUVk1jk/DaVHg==}
 
   '@formatjs/ecma402-abstract@2.3.4':
     resolution: {integrity: sha512-qrycXDeaORzIqNhBOx0btnhpD1c+/qFIHAN9znofuMJX6QBwtbrmlpWfD4oiUUD2vJUOIYFA/gYtg2KAMGG7sA==}
@@ -9936,6 +9942,12 @@ snapshots:
       react-dom: 19.1.1(react@19.1.1)
 
   '@floating-ui/utils@0.2.10': {}
+
+  '@flowershow/remark-wiki-link@2.0.4':
+    dependencies:
+      github-slugger: 2.0.0
+      mdast-util-to-markdown: 2.1.2
+      micromark-util-symbol: 2.0.1
 
   '@formatjs/ecma402-abstract@2.3.4':
     dependencies:

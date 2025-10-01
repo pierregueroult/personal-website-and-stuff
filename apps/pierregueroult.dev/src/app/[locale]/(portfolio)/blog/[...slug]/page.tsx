@@ -1,19 +1,24 @@
 import type { BlogResponse } from '@repo/db/types/blog/blog.interface';
 
 import { MDXRemote } from 'next-mdx-remote-client/rsc';
-import { forbidden, notFound, unauthorized } from 'next/navigation';
+import { forbidden, notFound, redirect, unauthorized } from 'next/navigation';
 import Script from 'next/script';
 import { Suspense } from 'react';
 
 import { BlogTracking } from '@/components/blog/blog-tracking';
 import ExcalidrawWithClientOnly from '@/components/blog/excalidraw';
+import { hasFileExtension } from '@/lib/blog/static-file-handler';
 import { get } from '@/lib/fetch/server';
-import { options } from '@/mdx-options';
-
-const ErrorComponent = () => <div>Error loading content</div>;
+import { createMDXOptions } from '@/lib/markdown/mdx';
 
 export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[...slug]'>) {
-  const slug = (await props.params).slug;
+  const params = await props.params;
+  const slug = params.slug;
+  const locale = params.locale;
+
+  if (hasFileExtension(slug)) {
+    redirect(`/api/blog-assets/${slug.join('/')}`);
+  }
 
   const { ok, data, code } = await get<BlogResponse>(`/blog/${slug.concat(',')}`, false);
 
@@ -27,7 +32,11 @@ export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[.
       <>
         <BlogTracking articleId={data.database.id} />
         <Suspense fallback={<div>Loading...</div>}>
-          <MDXRemote source={data.content} options={options} onError={ErrorComponent} />
+          <MDXRemote
+            source={data.content}
+            options={createMDXOptions(locale)}
+            onError={() => <div>There&apos;s an error there</div>}
+          />
         </Suspense>
       </>
     );
