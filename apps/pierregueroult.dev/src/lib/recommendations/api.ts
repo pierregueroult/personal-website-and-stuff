@@ -1,6 +1,9 @@
 import { InteractionAction } from '@repo/db/enum/blog/action';
 
 import { env } from '@/lib/env/client';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('RecommendationsAPI');
 
 export interface TrackInteractionPayload {
   articleId: string;
@@ -44,7 +47,7 @@ export async function trackInteraction(payload: TrackInteractionPayload): Promis
       body: JSON.stringify(payload),
     });
   } catch (error) {
-    console.error('Failed to track interaction:', error);
+    logger.error('Failed to track interaction:', error);
   }
 }
 
@@ -67,7 +70,7 @@ export async function getRecommendations(
 
     return await response.json();
   } catch (error) {
-    console.error('Failed to fetch recommendations:', error);
+    logger.error('Failed to fetch recommendations:', error);
     return [];
   }
 }
@@ -91,7 +94,7 @@ export async function getTrending(max: number = 5, days: number = 7): Promise<Tr
 
     return await response.json();
   } catch (error) {
-    console.error('Failed to fetch trending:', error);
+    logger.error('Failed to fetch trending:', error);
     return [];
   }
 }
@@ -109,7 +112,7 @@ export async function getProfileDebug() {
 
     return await response.json();
   } catch (error) {
-    console.error('Failed to fetch profile debug:', error);
+    logger.error('Failed to fetch profile debug:', error);
     return null;
   }
 }

@@ -1,6 +1,9 @@
 import { cookies } from 'next/headers';
 
 import { get } from '@/lib/fetch/server';
+import { Logger } from '@/lib/logger';
+
+const logger = new Logger('RecommendationsSSR');
 
 export interface RecommendationItem {
   articleId: string;
@@ -45,13 +48,13 @@ export async function getPersonalizedRecommendationsSSR(
     );
 
     if (!ok) {
-      console.error('Failed to fetch personalized recommendations SSR');
+      logger.error('Failed to fetch personalized recommendations SSR');
       return [];
     }
 
     return data;
   } catch (error) {
-    console.error('Error fetching personalized recommendations SSR:', error);
+    logger.error('Error fetching personalized recommendations SSR:', error);
     return [];
   }
 }
@@ -69,13 +72,13 @@ export async function getTrendingRecommendationsSSR(
     );
 
     if (!ok) {
-      console.error('Failed to fetch trending recommendations SSR');
+      logger.error('Failed to fetch trending recommendations SSR');
       return [];
     }
 
     return data;
   } catch (error) {
-    console.error('Error fetching trending recommendations SSR:', error);
+    logger.error('Error fetching trending recommendations SSR:', error);
     return [];
   }
 }
@@ -97,7 +100,7 @@ export async function getProfileDebugSSR() {
 
     return data;
   } catch (error) {
-    console.error('Error fetching profile debug SSR:', error);
+    logger.error('Error fetching profile debug SSR:', error);
     return null;
   }
 }
@@ -116,7 +119,7 @@ export async function getTrendingSSR(maxResults = 5, days = 7): Promise<Trending
 
     return data || [];
   } catch (error) {
-    console.error('Error fetching trending SSR:', error);
+    logger.error('Error fetching trending SSR:', error);
     return [];
   }
 }

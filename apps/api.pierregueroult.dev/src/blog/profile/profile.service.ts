@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { ObjectId } from 'mongodb';
@@ -11,6 +11,8 @@ import { UserInteraction } from '@repo/db/entities/blog/user-interaction';
 
 @Injectable()
 export class ProfileService {
+  private readonly logger = new Logger(ProfileService.name);
+
   constructor(
     @InjectRepository(AnonymousProfile)
     private readonly profileRepository: Repository<AnonymousProfile>,
@@ -91,7 +93,7 @@ export class ProfileService {
 
       await this.updateBehaviorProfile(profile, interaction);
     } catch (error) {
-      console.error('Error updating user interests:', error);
+      this.logger.error('Error updating user interests:', error);
     }
   }
 

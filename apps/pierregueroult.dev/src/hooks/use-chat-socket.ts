@@ -20,7 +20,6 @@ export function useChatSocket(): {
       setIsConnected(false);
     });
     socket.on('chat', (message: string) => {
-      console.log('Received message:', message);
       setMessages((prevMessages) => [...prevMessages, message]);
     });
 

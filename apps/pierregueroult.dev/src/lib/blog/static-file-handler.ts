@@ -2,7 +2,10 @@ import { readFile } from 'fs/promises';
 import { notFound } from 'next/navigation';
 import path from 'path';
 
+import { Logger } from '@/lib/logger';
+
 const CONTENT_BLOG_PATH = path.join(process.cwd(), '../../packages/content/blog');
+const logger = new Logger('StaticFileHandler');
 
 export const hasFileExtension = (slug: string[]): boolean => {
   if (slug.length === 0) return false;
@@ -52,7 +55,7 @@ export const serveStaticFile = async (slug: string[]) => {
       },
     });
   } catch (error) {
-    console.error('Error serving static file:', error);
+    logger.error('Error serving static file:', error);
     return notFound();
   }
 };

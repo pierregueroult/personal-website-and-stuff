@@ -35,8 +35,6 @@ export class TwitchAuthService {
       return token.accessToken;
     }
 
-    console.log('Refreshing Twitch access token');
-
     return await this.refreshAccessToken(token);
   }
 

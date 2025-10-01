@@ -1,7 +1,5 @@
 import { Fragment } from 'react';
 
-import ProjectSlider from '@/components/projects/slider';
-
 export default function Home() {
   return (
     <Fragment>
@@ -47,7 +45,7 @@ export default function Home() {
           </ul>
         </div>
       </section>
-      <section className="py-16">{/* <ProjectSlider /> */}</section>
+      <section className="py-16"></section>
     </Fragment>
   );
 }

@@ -28,6 +28,7 @@ export interface ContentResponse extends ContentResponseBase {
 
 export interface DrawingResponse extends ContentResponseBase {
   drawing: ExcalidrawJson;
+  markdown: string;
 }
 
 export interface KanbanResponse extends ContentResponseBase {

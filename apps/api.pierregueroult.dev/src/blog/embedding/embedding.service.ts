@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 
 import { spawn } from 'node:child_process';
 import { createHash } from 'node:crypto';
@@ -9,6 +9,7 @@ import { EmbeddingResponse } from './embedding.interface';
 
 @Injectable()
 export class EmbeddingService {
+  private readonly logger = new Logger(EmbeddingService.name);
   private readonly embeddingScript: string = path.join(__dirname, 'embedding.script.py');
   private readonly cacheDirectory: string = path.join(__dirname, 'cache');
 
@@ -27,7 +28,7 @@ export class EmbeddingService {
     try {
       await fs.mkdir(this.cacheDirectory, { recursive: true });
     } catch (error) {
-      console.error('Error creating cache directory:', error);
+      this.logger.error('Error creating cache directory:', error);
     }
   }
 

@@ -31,7 +31,7 @@ export class BlogService {
   constructor(
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     private readonly embeddingService: EmbeddingService,
-  ) {}
+  ) { }
 
   async getBlogContentBySlug(slug: string, user: User | null): Promise<BlogResponse> {
     const databaseData = await this.postRepository.findOne({
@@ -148,6 +148,7 @@ export class BlogService {
 
     try {
       const result = JSON.parse(resultAsString);
+
       return result;
     } catch {
       throw new Error('The drawing data is corrupted or invalid.');
@@ -166,6 +167,7 @@ export class BlogService {
         slug: content.slug,
         frontMatter: markdownData.frontMatter,
         drawing: result,
+        markdown: markdownData.content,
         database: {
           id: content._id.toHexString(),
           ...content,

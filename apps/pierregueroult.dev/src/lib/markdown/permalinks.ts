@@ -1,10 +1,14 @@
 import * as fs from 'fs';
 import * as path from 'path';
 
+import { Logger } from '@/lib/logger';
+
 const SUPPORTED_EXTENSIONS = {
   images: ['.jpg', '.jpeg', '.png', '.apng', '.webp', '.gif', '.svg', '.bmp', '.ico'],
   documents: ['.pdf'],
 } as const;
+
+const logger = new Logger('Permalinks');
 
 interface PermalinkConfig {
   contentPath: string;
@@ -30,7 +34,7 @@ function walkDirectory(dir: string, basePath: string = ''): string[] {
       }
     }
   } catch (error) {
-    console.warn(`Failed to read directory ${dir}:`, error);
+    logger.warn(`Failed to read directory ${dir}:`, error);
   }
 
   return permalinks;
@@ -67,7 +71,7 @@ export function generatePermalinks(config: PermalinkConfig): string[] {
     const resolvedPath = path.resolve(process.cwd(), contentPath);
 
     if (!fs.existsSync(resolvedPath)) {
-      console.warn(`Content path does not exist: ${resolvedPath}`);
+      logger.warn(`Content path does not exist: ${resolvedPath}`);
       return [];
     }
 
@@ -78,7 +82,7 @@ export function generatePermalinks(config: PermalinkConfig): string[] {
 
     return walkDirectory(resolvedPath);
   } catch (error) {
-    console.error('Failed to generate permalinks:', error);
+    logger.error('Failed to generate permalinks:', error);
     return [];
   }
 }
