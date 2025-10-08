@@ -1,4 +1,4 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { ForbiddenException, Injectable, Logger, NotFoundException, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 
 import { createHash } from 'crypto';
@@ -19,6 +19,7 @@ import type {
 } from '@repo/db/types/blog/blog.interface';
 
 import { EmbeddingService } from './embedding/embedding.service';
+import { slugifyPath } from './utils/slugify.util';
 
 const STRING_TO_VISIBILITY: Record<string, PostVisibility> = {
   public: PostVisibility.PUBLIC,
@@ -27,22 +28,44 @@ const STRING_TO_VISIBILITY: Record<string, PostVisibility> = {
 };
 
 @Injectable()
-export class BlogService {
+export class BlogService implements OnModuleInit {
+  private readonly logger = new Logger(BlogService.name);
+
   constructor(
     @InjectRepository(Post) private readonly postRepository: Repository<Post>,
     private readonly embeddingService: EmbeddingService,
   ) {}
 
+  async onModuleInit() {
+    this.logger.log('Starting blog content discovery and sync...');
+    await this.discoverAndSyncAllPosts();
+    this.logger.log('Blog content discovery completed');
+  }
+
   async getBlogContentBySlug(slug: string, user: User | null): Promise<BlogResponse> {
-    const databaseData = await this.postRepository.findOne({
-      where: { slug },
-      select: ['_id', 'fileHash'],
+    // Clean the slug (it comes from URL already slugified)
+    const cleanSlug = slugifyPath(slug);
+    
+    // Find post by clean slug
+    let databaseData = await this.postRepository.findOne({
+      where: { slug: cleanSlug },
+      select: ['_id', 'fileHash', 'originalFilePath', 'slug'],
     });
 
-    const markdownData = await this.readMarkdownFile(slug);
+    // Determine the file path to read
+    // If we have database data with originalFilePath, use it; otherwise try the clean slug
+    const filePathToRead = databaseData?.originalFilePath || slug;
+    
+    const markdownData = await this.readMarkdownFile(filePathToRead);
 
+    // If no database entry or needs sync, create/update it
     if (!databaseData || this.needsSync(databaseData, markdownData)) {
-      await this.syncContentToDatabase(slug, markdownData, databaseData);
+      await this.syncContentToDatabase(cleanSlug, filePathToRead, markdownData, databaseData);
+      // Reload database data after sync
+      databaseData = await this.postRepository.findOne({
+        where: { slug: cleanSlug },
+        select: ['_id', 'fileHash', 'originalFilePath', 'slug'],
+      });
     }
 
     this.validateAccessPermissions(databaseData, user);
@@ -52,12 +75,16 @@ export class BlogService {
     }
 
     const content = await this.postRepository.findOne({
-      where: { slug },
+      where: { slug: cleanSlug },
       relations: ['tags'],
     });
 
     if (!content) {
       throw new NotFoundException(`Blog post with slug "${slug}" not found.`);
+    }
+
+    if (!content._id) {
+      throw new Error(`Blog post "${slug}" is missing database ID. This should not happen.`);
     }
 
     this.validateAccessPermissions(content, user);
@@ -71,6 +98,63 @@ export class BlogService {
 
   async getAllPosts(): Promise<Post[]> {
     return this.postRepository.find();
+  }
+
+  async getPostsList(
+    page: number = 1,
+    pageSize: number = 10,
+    visibility?: PostVisibility,
+    tags?: string[],
+    user?: User | null,
+  ) {
+    const skip = (page - 1) * pageSize;
+
+    // Build where clause based on user authentication
+    const whereClause: any = {};
+
+    if (!user) {
+      // Anonymous users can only see public posts
+      whereClause.visibility = PostVisibility.PUBLIC;
+    } else if (visibility) {
+      // Authenticated users can filter by specific visibility
+      whereClause.visibility = visibility;
+    }
+    // If user is authenticated and no visibility specified, show all
+
+    const [posts, total] = await this.postRepository.findAndCount({
+      where: whereClause,
+      relations: ['tags'],
+      order: { createdAt: 'DESC' },
+      skip,
+      take: pageSize,
+    });
+
+    const postItems = posts.map((post) => ({
+      id: post._id.toHexString(),
+      title: post.title,
+      slug: post.slug,
+      visibility: post.visibility,
+      tags: post.tags?.map((tag) => tag.slug) || [],
+      viewCount: post.viewCount || 0,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      readingTime: post.averageReadingTime || this.estimateReadingTime(post.content),
+    }));
+
+    return {
+      posts: postItems,
+      total,
+      page,
+      pageSize,
+      hasMore: skip + posts.length < total,
+    };
+  }
+
+  private estimateReadingTime(content: string): number {
+    // Average reading speed: 200 words per minute
+    const wordsPerMinute = 200;
+    const wordCount = content.trim().split(/\s+/).length;
+    return Math.ceil(wordCount / wordsPerMinute);
   }
 
   async readMarkdownFile(slug: string): Promise<MarkdownContent> {
@@ -113,14 +197,16 @@ export class BlogService {
   }
 
   private async syncContentToDatabase(
-    slug: string,
+    cleanSlug: string,
+    originalFilePath: string,
     markdownData: MarkdownContent,
     existingData?: Post,
   ): Promise<void> {
     const post = existingData || new Post();
 
-    post.slug = slug;
-    post.title = markdownData.frontMatter.title || slug;
+    post.slug = cleanSlug;
+    post.originalFilePath = originalFilePath;
+    post.title = markdownData.frontMatter.title || cleanSlug;
     post.visibility =
       STRING_TO_VISIBILITY[markdownData.frontMatter.visibility] || PostVisibility.PRIVATE;
     post.fileHash = markdownData.fileHash;
@@ -194,5 +280,91 @@ export class BlogService {
     if (content?.visibility === PostVisibility.PRIVATE && !user) {
       throw new ForbiddenException('You must be logged in to access this content.');
     }
+  }
+
+  /**
+   * Discover and sync all markdown files from the content directory
+   * This runs on application startup to populate the database
+   */
+  private async discoverAndSyncAllPosts(): Promise<void> {
+    try {
+      const baseDir = this.resolveMarkdownFileDirectory();
+      const allFiles = await this.walkMarkdownDirectory(baseDir);
+      
+      this.logger.log(`Found ${allFiles.length} markdown files`);
+      
+      let synced = 0;
+      let skipped = 0;
+      
+      for (const relativePath of allFiles) {
+        try {
+          const cleanSlug = slugifyPath(relativePath);
+          
+          // Check if already in database
+          const existingPost = await this.postRepository.findOne({
+            where: { slug: cleanSlug },
+            select: ['_id', 'fileHash', 'slug'],
+          });
+          
+          // Read markdown file
+          const markdownData = await this.readMarkdownFile(relativePath);
+          
+          // Sync if new or changed
+          if (!existingPost || existingPost.fileHash !== markdownData.fileHash) {
+            await this.syncContentToDatabase(cleanSlug, relativePath, markdownData, existingPost);
+            synced++;
+          } else {
+            skipped++;
+          }
+        } catch (error) {
+          const message = error instanceof Error ? error.message : String(error);
+          this.logger.warn(`Failed to sync "${relativePath}": ${message}`);
+        }
+      }
+      
+      this.logger.log(`Sync complete: ${synced} synced, ${skipped} skipped`);
+    } catch (error) {
+      this.logger.error('Failed to discover and sync posts', error);
+    }
+  }
+
+  /**
+   * Recursively walk directory and find all .md files
+   * Returns relative paths from the base blog directory
+   */
+  private async walkMarkdownDirectory(
+    dir: string,
+    baseDir?: string,
+    relativePath: string = '',
+  ): Promise<string[]> {
+    const base = baseDir || dir;
+    const files: string[] = [];
+    
+    try {
+      const entries = await fs.readdir(dir, { withFileTypes: true });
+      
+      for (const entry of entries) {
+        // Skip hidden files and directories
+        if (entry.name.startsWith('.')) continue;
+        
+        const fullPath = resolve(dir, entry.name);
+        const relPath = relativePath ? `${relativePath}/${entry.name}` : entry.name;
+        
+        if (entry.isDirectory()) {
+          // Recursively walk subdirectories
+          const subFiles = await this.walkMarkdownDirectory(fullPath, base, relPath);
+          files.push(...subFiles);
+        } else if (entry.isFile() && entry.name.endsWith('.md')) {
+          // Remove .md extension for the relative path
+          const pathWithoutExt = relPath.replace(/\.md$/, '');
+          files.push(pathWithoutExt);
+        }
+      }
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to read directory ${dir}: ${message}`);
+    }
+    
+    return files;
   }
 }

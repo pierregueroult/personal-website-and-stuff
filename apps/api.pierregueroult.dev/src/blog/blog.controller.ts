@@ -1,17 +1,20 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query, UseInterceptors } from '@nestjs/common';
 
 import { CurrentUser } from 'src/auth/decorators/current-user.decorator';
 
 import { CreateInteractionDto } from '@repo/db/dto/blog/create-interaction';
 import { User } from '@repo/db/entities/auth/user';
+import { PostVisibility } from '@repo/db/enum/blog/status';
 
 import { Public } from '../auth/decorators/public.decorator';
 import { BlogService } from './blog.service';
+import { AnonymousIdInterceptor } from './profile/anonymous-id.interceptor';
 import { AnonymousProfile } from './profile/profile.decorator';
 import { ProfileService } from './profile/profile.service';
 import { RecommendationService } from './recommendation/recommendation.service';
 
 @Controller('blog')
+@UseInterceptors(AnonymousIdInterceptor)
 export class BlogController {
   constructor(
     private readonly blogService: BlogService,
@@ -20,12 +23,38 @@ export class BlogController {
   ) {}
 
   @Public()
+  @Get()
+  async listPosts(
+    @Query('page') page: number = 1,
+    @Query('pageSize') pageSize: number = 10,
+    @Query('visibility') visibility?: string,
+    @Query('tags') tags?: string,
+    @CurrentUser() user?: User | null,
+  ) {
+    const visibilityEnum = visibility as PostVisibility | undefined;
+    const tagArray = tags ? tags.split(',').map((t) => t.trim()) : undefined;
+    
+    return this.blogService.getPostsList(
+      Number(page),
+      Number(pageSize),
+      visibilityEnum,
+      tagArray,
+      user,
+    );
+  }
+
+  @Public()
   @Get('recommendations/:articleId')
-  async getRecommendations(@Param('articleId') articleId: string, @Query('max') max: number = 5) {
+  async getRecommendations(
+    @Param('articleId') articleId: string,
+    @Query('max') max: number = 5,
+    @AnonymousProfile() sessionId: string,
+  ) {
     return this.recommendationService.generateRecommendations({
+      sessionId,
       currentArticleId: articleId,
       includeContentBased: true,
-      includeCollaborative: false,
+      includeCollaborative: !!sessionId, // Enable collaborative if we have a session
       maxResults: max,
     });
   }
@@ -55,6 +84,11 @@ export class BlogController {
     @Body() interaction: CreateInteractionDto,
     @AnonymousProfile() sessionId: string,
   ) {
+    // SessionId should always exist due to the interceptor, but add safety check
+    if (!sessionId) {
+      return { success: false, error: 'No session ID available' };
+    }
+
     await this.profileService.createOrUpdateProfile(sessionId);
     await this.profileService.trackInteraction(sessionId, interaction);
     return { success: true, sessionId };

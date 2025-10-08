@@ -2,7 +2,7 @@
 
 import { InteractionAction } from '@repo/db/enum/blog/action';
 
-import { useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import { env } from '@/lib/env/client';
 import { trackInteraction } from '@/lib/recommendations/api';
@@ -11,12 +11,30 @@ interface BlogTrackingProps {
   articleId: string;
 }
 
+/**
+ * BlogTracking Component
+ * 
+ * Automatically tracks user interactions with blog posts:
+ * - View: Tracked once when the component mounts
+ * - Scroll: Tracked every 25% of scroll progress
+ * - Time Spent: Tracked when user leaves the page or tab becomes hidden
+ * 
+ * All tracking data is sent to the backend API for analytics and recommendations.
+ * 
+ * Note: Silently returns null if articleId is invalid to prevent crashes.
+ */
 export function BlogTracking({ articleId }: BlogTrackingProps) {
   const startTime = useRef<number>(Date.now());
   const lastScrollPosition = useRef<number>(0);
   const hasTrackedView = useRef<boolean>(false);
 
+  // Track page view
   useEffect(() => {
+    if (!articleId || articleId.trim() === '') {
+      console.error('BlogTracking: Invalid articleId provided');
+      return;
+    }
+
     if (hasTrackedView.current) return;
 
     hasTrackedView.current = true;
@@ -26,7 +44,10 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
     });
   }, [articleId]);
 
+  // Track scroll behavior
   useEffect(() => {
+    if (!articleId || articleId.trim() === '') return;
+
     const handleScroll = () => {
       const scrollHeight = document.documentElement.scrollHeight - window.innerHeight;
       const scrollPosition = window.scrollY;
@@ -51,10 +72,15 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [articleId]);
 
+  // Track time spent when leaving page
   useEffect(() => {
+    if (!articleId || articleId.trim() === '') return;
+
     const handleBeforeUnload = () => {
       const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
 
+      // Use sendBeacon for reliable tracking on page unload
+      // sendBeacon requires a full URL
       navigator.sendBeacon(
         `${env.NEXT_PUBLIC_API_URL}/blog/interactions`,
         JSON.stringify({
@@ -69,6 +95,7 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
       if (document.visibilityState === 'hidden') {
         const timeSpent = Math.round((Date.now() - startTime.current) / 1000);
 
+        // Use regular trackInteraction for visibility changes
         trackInteraction({
           articleId,
           action: InteractionAction.TIME_SPENT,
@@ -87,4 +114,43 @@ export function BlogTracking({ articleId }: BlogTrackingProps) {
   }, [articleId]);
 
   return null;
+}
+
+/**
+ * useBlogTracking Hook
+ * 
+ * Returns manual tracking functions for user actions like clicks and shares.
+ * Use this when you need to track specific user interactions beyond automatic tracking.
+ * 
+ * @example
+ * ```tsx
+ * const { trackClick, trackShare } = useBlogTracking(articleId);
+ * 
+ * <button onClick={() => trackClick('related-article')}>Read More</button>
+ * <button onClick={trackShare}>Share</button>
+ * ```
+ */
+export function useBlogTracking(articleId: string) {
+  const trackClick = useCallback(
+    (clickType: string) => {
+      trackInteraction({
+        articleId,
+        action: InteractionAction.CLICK_RELATED,
+        metadata: JSON.stringify({ clickType }),
+      });
+    },
+    [articleId],
+  );
+
+  const trackShare = useCallback(() => {
+    trackInteraction({
+      articleId,
+      action: InteractionAction.SHARE,
+    });
+  }, [articleId]);
+
+  return {
+    trackClick,
+    trackShare,
+  };
 }

@@ -28,10 +28,15 @@ export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[.
   if (!ok && code === 403) return forbidden();
   if (!ok) throw new Error('Internal server error');
 
+  // Validate that we have a database ID for tracking
+  if (!data.database?.id) {
+    console.error('Blog post missing database ID:', data.slug);
+  }
+
   if ('content' in data) {
     return (
       <>
-        <BlogTracking articleId={data.database.id} />
+        {data.database?.id && <BlogTracking articleId={data.database.id} />}
         <Suspense fallback={<div>Loading...</div>}>
           <MDXRemote
             source={data.content}
@@ -51,6 +56,7 @@ export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[.
 
     return (
       <>
+        {data.database?.id && <BlogTracking articleId={data.database.id} />}
         <Script id="load-env-variables" strategy="beforeInteractive">
           {`window["EXCALIDRAW_ASSET_PATH"] = window.origin;`}
         </Script>

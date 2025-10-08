@@ -31,6 +31,9 @@ export class Post {
   @Column({ unique: true })
   slug: string;
 
+  @Column({ nullable: true })
+  originalFilePath: string;
+
   @CreateDateColumn()
   createdAt: Date;
 

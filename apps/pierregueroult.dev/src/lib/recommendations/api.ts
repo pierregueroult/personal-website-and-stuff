@@ -5,6 +5,9 @@ import { Logger } from '@/lib/logger';
 
 const logger = new Logger('RecommendationsAPI');
 
+/**
+ * Payload for tracking user interactions with blog posts
+ */
 export interface TrackInteractionPayload {
   articleId: string;
   action: InteractionAction;
@@ -12,6 +15,9 @@ export interface TrackInteractionPayload {
   metadata?: string;
 }
 
+/**
+ * Response format for blog post recommendations
+ */
 export interface RecommendationResponse {
   articleId: string;
   title: string;
@@ -24,6 +30,9 @@ export interface RecommendationResponse {
   similarity?: number;
 }
 
+/**
+ * Response format for trending blog posts
+ */
 export interface TrendingResponse {
   articleId: string;
   title: string;
@@ -35,7 +44,14 @@ export interface TrendingResponse {
   reasons: string[];
 }
 
-// Track user interaction
+/**
+ * Track user interaction with a blog post
+ * 
+ * Sends interaction data to the backend for analytics and personalized recommendations.
+ * All requests include credentials to maintain anonymous session tracking.
+ * 
+ * @param payload - Interaction data (articleId, action, optional value and metadata)
+ */
 export async function trackInteraction(payload: TrackInteractionPayload): Promise<void> {
   try {
     await fetch(`${env.NEXT_PUBLIC_API_URL}/blog/interactions`, {
@@ -51,7 +67,16 @@ export async function trackInteraction(payload: TrackInteractionPayload): Promis
   }
 }
 
-// Get recommendations for an article
+/**
+ * Get personalized recommendations for a blog post
+ * 
+ * Fetches hybrid recommendations combining content-based filtering (similar articles)
+ * and collaborative filtering (based on user behavior patterns).
+ * 
+ * @param articleId - The ID of the current article
+ * @param maxResults - Maximum number of recommendations to return (default: 5)
+ * @returns Array of recommended articles with scores and reasons
+ */
 export async function getRecommendations(
   articleId: string,
   maxResults = 5,
@@ -75,7 +100,16 @@ export async function getRecommendations(
   }
 }
 
-// Get trending articles
+/**
+ * Get trending blog posts
+ * 
+ * Fetches articles with high engagement (views, scroll depth, time spent)
+ * within a specified time window.
+ * 
+ * @param max - Maximum number of trending posts to return (default: 5)
+ * @param days - Time window in days to consider (default: 7)
+ * @returns Array of trending articles with engagement metrics
+ */
 export async function getTrending(max: number = 5, days: number = 7): Promise<TrendingResponse[]> {
   try {
     const response = await fetch(
@@ -99,7 +133,14 @@ export async function getTrending(max: number = 5, days: number = 7): Promise<Tr
   }
 }
 
-// Get user profile debug info
+/**
+ * Get debug information about the current user's profile
+ * 
+ * Fetches the anonymous user profile data including interests, interactions,
+ * and behavioral patterns. Useful for debugging and testing recommendations.
+ * 
+ * @returns User profile debug data or null if unavailable
+ */
 export async function getProfileDebug() {
   try {
     const response = await fetch(`${env.NEXT_PUBLIC_API_URL}/blog/profile/debug`, {

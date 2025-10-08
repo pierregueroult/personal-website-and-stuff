@@ -9,12 +9,19 @@ import { UserInteraction } from '@repo/db/entities/blog/user-interaction';
 import { BlogController } from './blog.controller';
 import { BlogService } from './blog.service';
 import { EmbeddingService } from './embedding/embedding.service';
+import { AnonymousIdInterceptor } from './profile/anonymous-id.interceptor';
 import { ProfileService } from './profile/profile.service';
 import { RecommendationService } from './recommendation/recommendation.service';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Post, Recommendation, UserInteraction, AnonymousProfile])],
-  providers: [BlogService, EmbeddingService, RecommendationService, ProfileService],
+  providers: [
+    BlogService,
+    EmbeddingService,
+    RecommendationService,
+    ProfileService,
+    AnonymousIdInterceptor,
+  ],
   controllers: [BlogController],
 })
 export class BlogModule {}
