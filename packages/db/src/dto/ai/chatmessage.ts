@@ -1,5 +1,5 @@
 import { UIMessage } from 'ai';
-import { IsIn, IsString } from 'class-validator';
+import { Equals, IsIn, IsString } from 'class-validator';
 
 import { LOCALES, type Locale } from '@repo/i18n/locales';
 
@@ -12,4 +12,11 @@ export class ChatMessageDto {
 
   @IsValidUiMessageArray()
   messages: UIMessage[];
+
+  @IsString()
+  id: string;
+
+  @IsString()
+  @Equals('submit-message')
+  trigger: string;
 }

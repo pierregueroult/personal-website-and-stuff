@@ -23,6 +23,8 @@ async function getMessages(locale: Locale): Promise<LanguageMessagesStructure> {
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
+
+  console.log('Requested locale:', requested);
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
   const messages = await getMessages(locale);
   return {

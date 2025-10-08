@@ -10,7 +10,7 @@ type LenisProviderProps = {
 export default function LenisProvider({ children }: LenisProviderProps) {
   return (
     <Fragment>
-      <ReactLenis root />
+      <ReactLenis root options={{ prevent: (node) => node.closest('.chat-sidebar') !== null }} />
       {children}
     </Fragment>
   );

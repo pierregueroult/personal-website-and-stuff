@@ -10,8 +10,9 @@ import { BlogTracking } from '@/components/blog/blog-tracking';
 import ExcalidrawWithClientOnly from '@/components/blog/excalidraw';
 import { hasFileExtension } from '@/lib/blog/static-file-handler';
 import { get } from '@/lib/fetch/server';
+import { components } from '@/lib/markdown/components';
 import { parseDrawingFiles } from '@/lib/markdown/drawing';
-import { createMDXOptions } from '@/lib/markdown/mdx';
+import { options } from '@/lib/markdown/options';
 
 export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[...slug]'>) {
   const params = await props.params;
@@ -34,7 +35,8 @@ export default async function PublicBlogPage(props: PageProps<'/[locale]/blog/[.
         <Suspense fallback={<div>Loading...</div>}>
           <MDXRemote
             source={data.content}
-            options={createMDXOptions(locale)}
+            options={options(locale)}
+            components={components}
             onError={() => <div>There&apos;s an error there</div>}
           />
         </Suspense>

@@ -19,6 +19,7 @@
     "@c15t/nextjs": "^1.6.1",
     "@excalidraw/excalidraw": "^0.18.0",
     "@flowershow/remark-wiki-link": "^2.0.4",
+    "@hookform/resolvers": "^5.2.2",
     "@mdx-js/loader": "^3.1.1",
     "@mdx-js/react": "^3.1.1",
     "@next/mdx": "^15.5.3",
@@ -43,8 +44,9 @@
     "next-themes": "^0.4.6",
     "posthog-js": "^1.258.3",
     "posthog-node": "^5.6.0",
-    "react": "19.1.1",
-    "react-dom": "19.1.1",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
+    "react-hook-form": "^7.64.0",
     "rehype-accessible-emojis": "^0.3.2",
     "rehype-external-links": "^3.0.0",
     "rehype-pretty-code": "^0.14.1",
@@ -61,14 +63,8 @@
     "@repo/prettier-config": "workspace:*",
     "@repo/typescript-config": "workspace:*",
     "@types/node": "^22.15.3",
-    "@types/react": "19.1.11",
-    "@types/react-dom": "19.1.7",
+    "@types/react": "19.2.0",
+    "@types/react-dom": "19.2.0",
     "typescript": "5.8.2"
-  },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "19.1.11",
-      "@types/react-dom": "19.1.7"
-    }
   }
 }

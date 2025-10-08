@@ -84,6 +84,9 @@ export class EnvironmentVariables {
 
   @IsString()
   NODE_TLS_REJECT_UNAUTHORIZED: string = '1';
+
+  @IsString()
+  NEST_MISTRAL_API_KEY: string;
 }
 
 export function validateEnvironment(config: Record<string, unknown>): EnvironmentVariables {

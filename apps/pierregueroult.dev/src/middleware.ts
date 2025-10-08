@@ -13,7 +13,7 @@ const composeMiddlewares = (middlewares: {
     const parsedMiddlewares = Object.entries(middlewares);
     const initialResponse = Promise.resolve(NextResponse.next());
 
-    return parsedMiddlewares.reduce((prevPromise, [, middleware]) => {
+    return parsedMiddlewares.reduce(async (prevPromise, [, middleware]) => {
       return prevPromise.then((res) => {
         return res?.status >= 300 && res?.status < 400 ? res : middleware(req);
       });
@@ -22,8 +22,8 @@ const composeMiddlewares = (middlewares: {
 };
 
 export const middleware = composeMiddlewares({
-  i18nMiddleware: createMiddleware(routing),
   contentMiddleware: createContentMiddleware(),
+  i18nMiddleware: createMiddleware(routing),
 });
 
 export const config = {

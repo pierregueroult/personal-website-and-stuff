@@ -1,5 +1,6 @@
-import type { Options as RemarkWikiLinkOptions } from '@flowershow/remark-wiki-link';
-import remarkWikiLink from '@flowershow/remark-wiki-link';
+import remarkWikiLink, {
+  type Options as RemarkWikiLinkOptions,
+} from '@flowershow/remark-wiki-link';
 
 import type { MDXRemoteOptions } from 'next-mdx-remote-client/rsc';
 import { rehypeAccessibleEmojis } from 'rehype-accessible-emojis';
@@ -30,7 +31,7 @@ function createWikiLinkOptions(locale: string): RemarkWikiLinkOptions {
   };
 }
 
-export function createMDXOptions(locale: string = 'en'): MDXRemoteOptions {
+export function options(locale: string = 'en'): MDXRemoteOptions {
   const wikiLinkOptions = createWikiLinkOptions(locale);
 
   return {
@@ -45,4 +46,4 @@ export function createMDXOptions(locale: string = 'en'): MDXRemoteOptions {
   };
 }
 
-export const defaultMDXOptions: MDXRemoteOptions = createMDXOptions('en');
+export const defaultMDXOptions: MDXRemoteOptions = options('en');
